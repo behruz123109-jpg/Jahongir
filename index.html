@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0b1221" />
   <meta name="description" content="BilimXona — Supabase Auth JWT, PostgreSQL RLS va server RPC asosida ishlovchi xavfsiz onlayn test va imtihon platformasi." />
-  <title>BilimXona — Enterprise Ta'lim va Test Platformasi</title>
+  <title>BilimXona — Test va Imtihon Platformasi</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -124,15 +124,15 @@
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-lg sm:text-xl font-black lemon-title tracking-tight">BilimXona</span>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-lime-300/20 text-lime-200 border border-lime-300/40">Enterprise</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-lime-300/20 text-lime-200 border border-lime-300/40">Platforma</span>
                 </div>
-                <p id="jwt-session-banner" class="text-[11px] text-slate-200/90 font-semibold">JWT Sessiya tekshirilmoqda...</p>
+                <p id="jwt-session-banner" class="text-[11px] text-slate-200/90 font-semibold">Sessiya tekshirilmoqda...</p>
               </div>
             </button>
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
               <span id="exam-timer-pill" class="hidden px-2.5 py-1.5 rounded-xl bg-amber-950/90 text-amber-200 border border-amber-400/45 text-[11px] font-black">⏱️ 00:00</span>
               <span id="network-mode-pill" class="px-2.5 py-1.5 rounded-xl bg-slate-950/80 text-sky-200 border border-sky-300/30 text-[11px] font-extrabold">🌐 Tarmoq</span>
-              <button type="button" onclick="BilimXonaProd.openAuthSheet()" class="lemon-btn px-3 py-1.5 rounded-xl text-xs font-black">🔐 Kirish / Ulanish</button>
+              <button type="button" id="auth-header-btn" onclick="BilimXonaProd.openAuthSheet()" class="lemon-btn px-3 py-1.5 rounded-xl text-xs font-black">🔐 Kirish / Ro'yxat</button>
               <button type="button" onclick="BilimXonaProd.toggleSoftDayMode()" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-950/85 hover:bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-extrabold" title="Rejimni almashtirish">🌓</button>
             </div>
           </div>
@@ -149,7 +149,7 @@
     <footer class="app-footer mt-12 py-6 px-4 text-xs text-slate-400">
       <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
         <div><strong class="lemon-title">BilimXona</strong> — Supabase Auth JWT + PostgreSQL RLS + RPC <code class="text-lime-300">verify_answer</code></div>
-        <div class="text-[11px] text-lime-300/85 font-semibold">Zero-Trust Client • Server-side Javob Tekshiruvi</div>
+        <div class="text-[11px] text-lime-300/85 font-semibold">Xavfsiz Test va Boshqaruv Tizimi</div>
       </div>
     </footer>
   </div>
@@ -167,39 +167,48 @@
     </div>
   </div>
 
-  <div id="jwt-auth-sheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-slate-950/85 backdrop-blur-sm p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Kirish va Supabase ulanishi">
+  <div id="jwt-auth-sheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-slate-950/85 backdrop-blur-sm p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Kirish va ro'yxatdan o'tish">
     <div class="bottom-sheet-panel w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto space-y-5">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
-          <span class="lemon-pill px-2.5 py-0.5 rounded-full text-[11px] font-black">🔐 Supabase Auth JWT</span>
-          <h2 class="text-xl font-black lemon-title mt-1">Akkaunt va Baza Sozlamalari</h2>
+          <span class="lemon-pill px-2.5 py-0.5 rounded-full text-[11px] font-black">🔐 Akkaunt</span>
+          <h2 class="text-xl font-black lemon-title mt-1">Kirish / Ro'yxatdan O'tish</h2>
         </div>
         <button type="button" onclick="BilimXonaProd.closeAuthSheet()" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-lime-300 border border-slate-700 text-xs font-black">✕ Yopish</button>
       </div>
 
       <form onsubmit="BilimXonaProd.submitJwtLogin(event)" class="space-y-3 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
-        <div class="text-xs font-black text-lime-300">1. Foydalanuvchi / Admin Kirishi</div>
-        <input id="jwt-login-email" type="email" required autocomplete="email" placeholder="email@domen.uz" class="field" />
+        <div class="text-xs font-black text-lime-300">Email va parol kiriting (kamida 6 belgi)</div>
+        <input id="jwt-login-email" type="email" required autocomplete="email" placeholder="sizning@email.uz" class="field" />
         <input id="jwt-login-password" type="password" required minlength="6" autocomplete="current-password" placeholder="Parol (kamida 6 belgi)" class="field" />
+        <div id="auth-status-hint" class="text-[11px] text-amber-300 min-h-[16px]"></div>
         <div class="flex flex-wrap gap-2">
-          <button type="submit" class="lemon-btn flex-1 min-w-[130px] py-2.5 rounded-xl text-xs font-black">✅ Kirish</button>
-          <button type="button" onclick="BilimXonaProd.signUpJwt()" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">📝 Ro'yxatdan o'tish</button>
+          <button type="submit" id="auth-submit-btn" class="lemon-btn flex-1 min-w-[130px] py-2.5 rounded-xl text-xs font-black">✅ Kirish</button>
+          <button type="button" id="auth-signup-btn" onclick="BilimXonaProd.signUpJwt()" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">📝 Ro'yxatdan o'tish</button>
           <button type="button" onclick="BilimXonaProd.logoutJwt()" class="tactile-btn px-4 py-2.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-xs font-black">Chiqish</button>
         </div>
       </form>
 
-      <form onsubmit="BilimXonaProd.connectSupabaseProject(event)" class="space-y-3 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
-        <div class="text-xs font-black text-lime-300">2. Supabase Loyiha Parametrlari (IndexedDB)</div>
-        <input id="supa-project-url" type="url" required placeholder="https://xyzcompany.supabase.co" class="field" />
-        <input id="supa-project-anon" type="text" required placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6... (Anon Public Key)" class="field" />
-        <button type="submit" class="lemon-btn w-full py-2.5 rounded-xl text-xs font-black">☁️ Supabase Clientni Ishga Tushirish</button>
-      </form>
+      <details class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
+        <summary class="text-xs font-black text-slate-300 cursor-pointer">⚙️ Baza ulanishi (faqat sozlash uchun)</summary>
+        <form onsubmit="BilimXonaProd.connectSupabaseProject(event)" class="space-y-3 mt-3">
+          <input id="supa-project-url" type="url" required placeholder="https://xyzcompany.supabase.co" class="field" />
+          <input id="supa-project-anon" type="text" required placeholder="Supabase Anon Public Key" class="field" />
+          <button type="submit" class="lemon-btn w-full py-2.5 rounded-xl text-xs font-black">☁️ Ulanishni Saqlash</button>
+        </form>
+      </details>
     </div>
   </div>
 
   <script>
   (function () {
     'use strict';
+
+    // =====================================================================
+    // O'Z SUPABASE URL VA ANON KEY INGIZNI SHU YERGA YOZING:
+    // =====================================================================
+    const DEFAULT_SUPABASE_URL = '';
+    const DEFAULT_SUPABASE_ANON_KEY = '';
 
     const IDB_NAME = 'bilimxona_enterprise_v2';
     const IDB_STORE = 'runtime_cache';
@@ -242,12 +251,13 @@
       softDayMode: false,
       supabaseClient: null,
       authSub: null,
-      supabaseUrl: '',
-      supabaseAnonKey: '',
+      supabaseUrl: DEFAULT_SUPABASE_URL,
+      supabaseAnonKey: DEFAULT_SUPABASE_ANON_KEY,
       session: null,
       userId: null,
       userEmail: '',
       isServerAdmin: false,
+      authBusy: false,
       loading: false,
       subjects: [],
       topics: [],
@@ -266,7 +276,7 @@
       history: null,
       editingQuestionId: null,
       editingDraft: blankDraft(),
-      statusMessage: 'Supabase loyihasini ulang yoki JWT sessiyani faollashtiring.'
+      statusMessage: 'Baza ulanmoqda...'
     };
 
     const $ = id => document.getElementById(id);
@@ -320,10 +330,20 @@
     }
     function errMsg(e) {
       if (!e) return 'Noma\'lum xatolik';
-      if (e.code === '42501' || /forbidden|permission denied|row-level security/i.test(e.message || '')) {
+      const raw = e.message || String(e);
+      if (e.code === '42501' || /forbidden|permission denied|row-level security/i.test(raw)) {
         return 'Ruxsat yo\'q (403): bu amal faqat adminlar uchun.';
       }
-      return e.message || String(e);
+      if (/invalid login credentials/i.test(raw)) {
+        return 'Email yoki parol noto\'g\'ri.';
+      }
+      if (/user already registered/i.test(raw)) {
+        return 'Bu email bilan allaqachon ro\'yxatdan o\'tilgan. "Kirish" tugmasini bosing.';
+      }
+      if (/password should be at least/i.test(raw)) {
+        return 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak.';
+      }
+      return raw;
     }
     function notify(text, level) {
       const stack = $('prod-toast-stack');
@@ -340,6 +360,19 @@
       stack.appendChild(el);
       if (window.gsap) gsap.fromTo(el, { y: -10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2 });
       setTimeout(() => el.remove(), 3500);
+    }
+    function setAuthHint(msg, isErr) {
+      const el = $('auth-status-hint');
+      if (!el) return;
+      el.textContent = msg || '';
+      el.className = 'text-[11px] min-h-[16px] font-bold ' + (isErr ? 'text-rose-300' : 'text-lime-300');
+    }
+    function setAuthBusy(busy) {
+      state.authBusy = busy;
+      const b1 = $('auth-submit-btn');
+      const b2 = $('auth-signup-btn');
+      if (b1) b1.disabled = busy;
+      if (b2) b2.disabled = busy;
     }
     function askConfirm(text, title) {
       return new Promise(resolve => {
@@ -377,10 +410,15 @@
     }
     function updateJwtBanner() {
       const b = $('jwt-session-banner');
-      if (!b) return;
-      b.textContent = (state.session && state.userEmail)
-        ? state.userEmail + ' • ' + (state.isServerAdmin ? 'ADMIN (RLS tasdiqlangan)' : 'Talaba / Foydalanuvchi')
-        : 'Mehmon rejimi • Natijalarni saqlash uchun tizimga kiring';
+      const btn = $('auth-header-btn');
+      if (b) {
+        b.textContent = (state.session && state.userEmail)
+          ? state.userEmail + ' • ' + (state.isServerAdmin ? 'ADMIN' : 'Foydalanuvchi')
+          : 'Mehmon rejimi • Kirish yoki ro\'yxatdan o\'tish mumkin';
+      }
+      if (btn) {
+        btn.textContent = (state.session && state.userEmail) ? '👤 ' + state.userEmail.split('@')[0] : '🔐 Kirish / Ro\'yxat';
+      }
     }
 
     function formatSeconds(sec) {
@@ -470,12 +508,21 @@
       }
     }
 
+    async function ensureConnected() {
+      if (state.supabaseClient) return true;
+      const url = (state.supabaseUrl || DEFAULT_SUPABASE_URL || '').trim();
+      const key = (state.supabaseAnonKey || DEFAULT_SUPABASE_ANON_KEY || '').trim();
+      if (url && key) return await initSupabaseClient(url, key);
+      return false;
+    }
+
     async function applyJwtSession(session) {
       state.session = session || null;
       state.userId = session && session.user ? session.user.id : null;
       state.userEmail = session && session.user ? (session.user.email || '') : '';
       state.history = null;
       await checkAdminViaRpc();
+      if (!state.isServerAdmin && state.view === 'admin') state.view = 'quiz';
     }
 
     async function checkAdminViaRpc() {
@@ -531,7 +578,7 @@
     }
 
     async function syncCatalogFromSupabase() {
-      if (!state.supabaseClient) { await loadCatalogFromCache(); return false; }
+      if (!await ensureConnected()) { await loadCatalogFromCache(); return false; }
       state.loading = true;
       try {
         const sb = state.supabaseClient;
@@ -602,7 +649,7 @@
       if (!q || state.verifyingAnswer) return;
       const chosenId = state.draftSelections[q.id];
       if (!chosenId) return;
-      if (!state.supabaseClient) { notify('Avval Supabase\'ga ulaning.', 'warn'); return openAuthSheet(); }
+      if (!await ensureConnected()) { notify('Baza ulanmagan. Sozlamalarni tekshiring.', 'warn'); return openAuthSheet(); }
       if (!navigator.onLine) { notify('Javobni tekshirish uchun internet kerak.', 'warn'); return; }
 
       state.verifyingAnswer = true;
@@ -685,7 +732,7 @@
         { act: 'nav', view: 'results', icon: '📊', label: 'Natija', on: state.view === 'results' },
         state.isServerAdmin
           ? { act: 'nav', view: 'admin', icon: '🛠️', label: 'Admin', on: state.view === 'admin' }
-          : { act: 'auth', icon: '🔐', label: state.session ? 'Profil' : 'Kirish', on: false },
+          : { act: 'auth', icon: '🔐', label: state.session ? 'Akkaunt' : 'Kirish', on: false },
         { act: 'theme', icon: '🌓', label: 'Rejim', on: false }
       ];
       dock.innerHTML = items.map(i =>
@@ -730,7 +777,7 @@
         html += '<section class="app-card rounded-3xl p-8 text-center space-y-3">' +
           '<div class="text-4xl">' + (state.loading ? '⏳' : '📭') + '</div>' +
           '<p class="text-sm font-bold text-slate-200">' + esc(state.loading ? 'Yuklanmoqda...' : (state.statusMessage || 'Bu filtr bo\'yicha savol topilmadi.')) + '</p>' +
-          (!state.supabaseClient ? '<button type="button" data-act="auth" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black">🔐 Ulanish</button>' : '') +
+          (!state.supabaseClient ? '<button type="button" data-act="auth" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black">🔐 Kirish / Sozlash</button>' : '') +
           '</section>';
         return html;
       }
@@ -941,6 +988,7 @@
     function openAuthSheet() {
       const s = $('jwt-auth-sheet');
       s.classList.remove('hidden'); s.classList.add('flex');
+      setAuthHint('');
       if (state.supabaseUrl) $('supa-project-url').value = state.supabaseUrl;
       if (state.supabaseAnonKey) $('supa-project-anon').value = state.supabaseAnonKey;
     }
@@ -959,32 +1007,81 @@
       const ok = await initSupabaseClient($('supa-project-url').value, $('supa-project-anon').value);
       if (ok) {
         await syncCatalogFromSupabase();
-        closeAuthSheet();
+        setAuthHint('Baza ulandi! Endi kirish yoki ro\'yxatdan o\'tish mumkin.', false);
         notify('Supabase muvaffaqiyatli ulandi.', 'success');
       }
       renderApp();
     }
+
     async function submitJwtLogin(e) {
       e.preventDefault();
-      if (!state.supabaseClient) return notify('Avval Supabase loyihasini ulang.', 'warn');
-      const { error } = await state.supabaseClient.auth.signInWithPassword({
-        email: $('jwt-login-email').value.trim(),
-        password: $('jwt-login-password').value
-      });
-      if (error) return notify('Kirish xatosi: ' + errMsg(error), 'error');
-      $('jwt-login-password').value = '';
-      closeAuthSheet();
-      notify('Muvaffaqiyatli kirdingiz.', 'success');
-    }
-    async function signUpJwt() {
-      if (!state.supabaseClient) return notify('Avval Supabase loyihasini ulang.', 'warn');
+      if (state.authBusy) return;
+      if (!await ensureConnected()) {
+        setAuthHint('Baza ulanmagan. Pastdagi "Baza ulanishi" qismidan URL va Key kiriting.', true);
+        return;
+      }
       const email = $('jwt-login-email').value.trim();
       const password = $('jwt-login-password').value;
-      if (!email || password.length < 6) return notify('Email va kamida 6 belgili parol kiriting.', 'warn');
-      const { data, error } = await state.supabaseClient.auth.signUp({ email, password });
-      if (error) return notify('Ro\'yxatdan o\'tish xatosi: ' + errMsg(error), 'error');
-      notify(data.session ? 'Akkaunt yaratildi.' : 'Emailingizga tasdiqlash xati yuborildi.', 'success');
+      setAuthBusy(true);
+      setAuthHint('Kirish tekshirilmoqda...', false);
+      try {
+        const { error } = await state.supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) {
+          const msg = errMsg(error);
+          setAuthHint(msg, true);
+          notify('Kirish xatosi: ' + msg, 'error');
+          return;
+        }
+        $('jwt-login-password').value = '';
+        setAuthHint('', false);
+        closeAuthSheet();
+        notify('Muvaffaqiyatli kirdingiz!', 'success');
+      } finally {
+        setAuthBusy(false);
+      }
     }
+
+    async function signUpJwt() {
+      if (state.authBusy) return;
+      if (!await ensureConnected()) {
+        setAuthHint('Baza ulanmagan. Pastdagi "Baza ulanishi" qismidan URL va Key kiriting.', true);
+        return;
+      }
+      const email = $('jwt-login-email').value.trim();
+      const password = $('jwt-login-password').value;
+      if (!email || !email.includes('@')) {
+        setAuthHint('To\'g\'ri email kiriting (masalan: ism@gmail.com).', true);
+        return;
+      }
+      if (password.length < 6) {
+        setAuthHint('Parol kamida 6 ta belgidan iborat bo\'lishi kerak.', true);
+        return;
+      }
+
+      setAuthBusy(true);
+      setAuthHint('Ro\'yxatdan o\'tkazilmoqda...', false);
+      try {
+        const { data, error } = await state.supabaseClient.auth.signUp({ email, password });
+        if (error) {
+          const msg = errMsg(error);
+          setAuthHint(msg, true);
+          notify('Ro\'yxatdan o\'tish xatosi: ' + msg, 'error');
+          return;
+        }
+        $('jwt-login-password').value = '';
+        if (data && data.session) {
+          setAuthHint('', false);
+          closeAuthSheet();
+          notify('Ro\'yxatdan o\'tdingiz va tizimga kirdingiz!', 'success');
+        } else {
+          setAuthHint('Akkaunt yaratildi! Agar email tasdiqlash yoqilgan bo\'lsa, emailingizni tekshiring yoki kirish qiling.', false);
+          notify('Ro\'yxatdan o\'tish so\'rovi yuborildi.', 'success');
+        }
+      } finally {
+        setAuthBusy(false);
+      }
+    }
+
     async function logoutJwt() {
       if (!state.supabaseClient) return;
       const { error } = await state.supabaseClient.auth.signOut();
@@ -992,6 +1089,7 @@
       state.answers = {};
       state.draftSelections = {};
       if (state.view === 'admin') state.view = 'quiz';
+      setAuthHint('', false);
       notify('Tizimdan chiqdingiz.', 'info');
     }
 
@@ -1199,7 +1297,7 @@
       updateNetworkBadge();
       if (state.supabaseClient) { await syncCatalogFromSupabase(); renderApp(); }
     });
-    window.addEventListener('offline', () => { updateNetworkBadge(); notify('Offline rejim: keshlangan savollar ko\'rsatiladi.', 'warn'); });
+    window.addEventListener('offline', () => { updateNetworkBadge(); notify('Offline rejim: keshlangan savollar ko\'rsatilmoqda.', 'warn'); });
     $('jwt-auth-sheet').addEventListener('click', e => { if (e.target.id === 'jwt-auth-sheet') closeAuthSheet(); });
 
     window.BilimXonaProd = {
@@ -1213,15 +1311,19 @@
       if (soft) { state.softDayMode = true; document.body.classList.add('soft-day-mode'); }
 
       const cfg = await idbGet('supabase_config');
+      const url = (cfg && cfg.url) || DEFAULT_SUPABASE_URL;
+      const key = (cfg && cfg.anonKey) || DEFAULT_SUPABASE_ANON_KEY;
+
       let connected = false;
-      if (cfg && cfg.url && cfg.anonKey) connected = await initSupabaseClient(cfg.url, cfg.anonKey);
+      if (url && key) connected = await initSupabaseClient(url, key);
 
       if (connected) {
         await syncCatalogFromSupabase();
       } else {
         const had = await loadCatalogFromCache();
-        state.statusMessage = had ? 'Saqlangan nusxa ko\'rsatilmoqda. Yangilash uchun Supabase\'ga ulaning.' : 'Supabase loyihasini ulang yoki JWT sessiyani faollashtiring.';
-        if (!cfg) setTimeout(openAuthSheet, 400);
+        state.statusMessage = had
+          ? 'Saqlangan nusxa ko\'rsatilmoqda.'
+          : 'Baza hali ulanmagan. "Kirish / Ro\'yxat" tugmasini bosib "Baza ulanishi"ni kiriting.';
       }
       renderApp();
     })();
