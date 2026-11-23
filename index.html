@@ -25,11 +25,7 @@
       --surface-card: linear-gradient(155deg, rgba(12, 19, 36, 0.96) 0%, rgba(6, 10, 19, 0.98) 100%);
       --border-subtle: rgba(148, 163, 184, 0.16);
       --text-primary: #e8f1ff;
-      --text-secondary: #9fb0cc;
       --lemon-soft: #d9f99d;
-      --lemon-mid: #bef264;
-      --lemon-bright: #a3e635;
-      --lemon-deep: #84cc16;
     }
     body.soft-day-mode {
       --bg-obsidian: #151d30;
@@ -38,7 +34,6 @@
       --surface-card: linear-gradient(155deg, rgba(27, 38, 60, 0.96) 0%, rgba(19, 28, 46, 0.98) 100%);
       --border-subtle: rgba(190, 242, 100, 0.24);
       --text-primary: #edf4ff;
-      --text-secondary: #b7c7e0;
     }
     body {
       background-color: var(--bg-obsidian);
@@ -97,7 +92,7 @@
     .field {
       width: 100%; padding: 0.65rem 0.875rem; border-radius: 0.75rem;
       background: #0b1220; border: 1px solid #334155; color: #e8f1ff;
-      font-size: 0.78rem; outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-size: 0.8rem; outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .field:focus { border-color: #a3e635; box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.12); }
     .opt-btn { transition: transform 0.14s ease, border-color 0.15s ease, background-color 0.15s ease; }
@@ -124,9 +119,9 @@
               <div>
                 <div class="flex items-center gap-2">
                   <span class="text-lg sm:text-xl font-black lemon-title tracking-tight">BilimXona</span>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-lime-300/20 text-lime-200 border border-lime-300/40">Platforma</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-lime-300/20 text-lime-200 border border-lime-300/40">Online</span>
                 </div>
-                <p id="jwt-session-banner" class="text-[11px] text-slate-200/90 font-semibold">Sessiya tekshirilmoqda...</p>
+                <p id="jwt-session-banner" class="text-[11px] text-slate-200/90 font-semibold">Ulanmoqda...</p>
               </div>
             </button>
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -178,25 +173,16 @@
       </div>
 
       <form onsubmit="BilimXonaProd.submitJwtLogin(event)" class="space-y-3 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
-        <div class="text-xs font-black text-lime-300">Email va parol kiriting (kamida 6 belgi)</div>
+        <div class="text-xs font-black text-lime-300">Email va parol kiriting (parol kamida 6 belgi)</div>
         <input id="jwt-login-email" type="email" required autocomplete="email" placeholder="sizning@email.uz" class="field" />
         <input id="jwt-login-password" type="password" required minlength="6" autocomplete="current-password" placeholder="Parol (kamida 6 belgi)" class="field" />
-        <div id="auth-status-hint" class="text-[11px] text-amber-300 min-h-[16px]"></div>
+        <div id="auth-status-hint" class="text-[11px] min-h-[16px] font-bold"></div>
         <div class="flex flex-wrap gap-2">
           <button type="submit" id="auth-submit-btn" class="lemon-btn flex-1 min-w-[130px] py-2.5 rounded-xl text-xs font-black">✅ Kirish</button>
           <button type="button" id="auth-signup-btn" onclick="BilimXonaProd.signUpJwt()" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">📝 Ro'yxatdan o'tish</button>
           <button type="button" onclick="BilimXonaProd.logoutJwt()" class="tactile-btn px-4 py-2.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-xs font-black">Chiqish</button>
         </div>
       </form>
-
-      <details class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
-        <summary class="text-xs font-black text-slate-300 cursor-pointer">⚙️ Baza ulanishi (faqat sozlash uchun)</summary>
-        <form onsubmit="BilimXonaProd.connectSupabaseProject(event)" class="space-y-3 mt-3">
-          <input id="supa-project-url" type="url" required placeholder="https://xyzcompany.supabase.co" class="field" />
-          <input id="supa-project-anon" type="text" required placeholder="Supabase Anon Public Key" class="field" />
-          <button type="submit" class="lemon-btn w-full py-2.5 rounded-xl text-xs font-black">☁️ Ulanishni Saqlash</button>
-        </form>
-      </details>
     </div>
   </div>
 
@@ -204,13 +190,10 @@
   (function () {
     'use strict';
 
-    // =====================================================================
-    // O'Z SUPABASE URL VA ANON KEY INGIZNI SHU YERGA YOZING:
-    // =====================================================================
-    const DEFAULT_SUPABASE_URL = '';
-    const DEFAULT_SUPABASE_ANON_KEY = '';
+    const DEFAULT_SUPABASE_URL = 'https://mfonyhivgisrrgfumrqm.supabase.co';
+    const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_y1QrN9WVmcLz-1SrFRxliw_q0_w7ixh';
 
-    const IDB_NAME = 'bilimxona_enterprise_v2';
+    const IDB_NAME = 'bilimxona_enterprise_v3';
     const IDB_STORE = 'runtime_cache';
     const MAX_OPTIONS = 6;
     const MIN_OPTIONS = 2;
@@ -276,7 +259,7 @@
       history: null,
       editingQuestionId: null,
       editingDraft: blankDraft(),
-      statusMessage: 'Baza ulanmoqda...'
+      statusMessage: 'Ma\'lumotlar yuklanmoqda...'
     };
 
     const $ = id => document.getElementById(id);
@@ -343,6 +326,9 @@
       if (/password should be at least/i.test(raw)) {
         return 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak.';
       }
+      if (/relation .* does not exist/i.test(raw)) {
+        return 'Baza jadvallari hali yaratilmagan. Supabase SQL Editor da schema.sql ni ishga tushiring.';
+      }
       return raw;
     }
     function notify(text, level) {
@@ -401,10 +387,10 @@
         el.textContent = '📴 Offline';
         el.className = base + 'bg-amber-950/90 text-amber-200 border-amber-400/40';
       } else if (state.supabaseClient) {
-        el.textContent = '☁️ Online';
+        el.textContent = '☁️ Ulangan';
         el.className = base + 'bg-emerald-950/90 text-lime-200 border-lime-300/40';
       } else {
-        el.textContent = '🔌 Ulanmagan';
+        el.textContent = '🔌 Ulanmoqda';
         el.className = base + 'bg-slate-950/85 text-sky-200 border-sky-300/30';
       }
     }
@@ -472,11 +458,9 @@
       const cleanKey = (anonKey || '').trim();
       if (!cleanUrl || !cleanKey) return false;
       if (!window.supabase || !window.supabase.createClient) {
-        notify('Supabase kutubxonasi yuklanmadi.', 'error');
+        notify('Kutubxona yuklanmadi. Internetni tekshiring.', 'error');
         return false;
       }
-      if (!safeUrl(cleanUrl)) { notify('Supabase URL noto\'g\'ri.', 'error'); return false; }
-
       try {
         if (state.authSub) { state.authSub.unsubscribe(); state.authSub = null; }
         state.supabaseUrl = cleanUrl;
@@ -485,7 +469,6 @@
           auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
         });
 
-        await idbSet('supabase_config', { url: cleanUrl, anonKey: cleanKey });
         const { data } = await state.supabaseClient.auth.getSession();
         await applyJwtSession(data && data.session ? data.session : null);
 
@@ -510,10 +493,7 @@
 
     async function ensureConnected() {
       if (state.supabaseClient) return true;
-      const url = (state.supabaseUrl || DEFAULT_SUPABASE_URL || '').trim();
-      const key = (state.supabaseAnonKey || DEFAULT_SUPABASE_ANON_KEY || '').trim();
-      if (url && key) return await initSupabaseClient(url, key);
-      return false;
+      return await initSupabaseClient(state.supabaseUrl, state.supabaseAnonKey);
     }
 
     async function applyJwtSession(session) {
@@ -603,8 +583,9 @@
         return true;
       } catch (e) {
         const had = await loadCatalogFromCache();
-        state.statusMessage = had ? 'Server bilan aloqa yo\'q — kesh nusxa ko\'rsatilmoqda.' : 'Ma\'lumot yuklanmadi: ' + errMsg(e);
-        notify('Katalog yuklanmadi: ' + errMsg(e), 'warn');
+        state.statusMessage = had
+          ? 'Kesh nusxa ko\'rsatilmoqda. (' + errMsg(e) + ')'
+          : errMsg(e);
         return false;
       } finally {
         state.loading = false;
@@ -649,7 +630,7 @@
       if (!q || state.verifyingAnswer) return;
       const chosenId = state.draftSelections[q.id];
       if (!chosenId) return;
-      if (!await ensureConnected()) { notify('Baza ulanmagan. Sozlamalarni tekshiring.', 'warn'); return openAuthSheet(); }
+      if (!await ensureConnected()) { notify('Baza bilan aloqa yo\'q.', 'warn'); return; }
       if (!navigator.onLine) { notify('Javobni tekshirish uchun internet kerak.', 'warn'); return; }
 
       state.verifyingAnswer = true;
@@ -758,9 +739,9 @@
       let html = '<section class="app-card rounded-3xl p-4 sm:p-5 space-y-3">' +
         '<div class="flex flex-wrap items-center justify-between gap-2">' +
         '<div class="flex items-center gap-2"><h1 class="text-lg font-black lemon-title">📝 Test ishlash</h1>' +
-        '<button type="button" data-act="shuffle" class="tactile-btn px-2.5 py-1 rounded-xl bg-slate-900 text-sky-200 border border-slate-700 text-[11px] font-black" title="Savollarni aralashtirish">🔀 Aralashtirish</button>' +
+        '<button type="button" data-act="shuffle" class="tactile-btn px-2.5 py-1 rounded-xl bg-slate-900 text-sky-200 border border-slate-700 text-[11px] font-black">🔀 Aralashtirish</button>' +
         (!state.examMode
-          ? '<button type="button" data-act="start-exam" class="tactile-btn px-2.5 py-1 rounded-xl bg-amber-950/80 text-amber-200 border border-amber-400/40 text-[11px] font-black">⏱️ Imtihon rejimi</button>'
+          ? '<button type="button" data-act="start-exam" class="tactile-btn px-2.5 py-1 rounded-xl bg-amber-950/80 text-amber-200 border border-amber-400/40 text-[11px] font-black">⏱️ Imtihon</button>'
           : '<button type="button" data-act="stop-exam" class="tactile-btn px-2.5 py-1 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-400/40 text-[11px] font-black">⏹️ Yakunlash</button>') +
         '</div>' +
         '<div class="flex gap-1.5 text-[11px] font-black">' +
@@ -777,7 +758,6 @@
         html += '<section class="app-card rounded-3xl p-8 text-center space-y-3">' +
           '<div class="text-4xl">' + (state.loading ? '⏳' : '📭') + '</div>' +
           '<p class="text-sm font-bold text-slate-200">' + esc(state.loading ? 'Yuklanmoqda...' : (state.statusMessage || 'Bu filtr bo\'yicha savol topilmadi.')) + '</p>' +
-          (!state.supabaseClient ? '<button type="button" data-act="auth" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black">🔐 Kirish / Sozlash</button>' : '') +
           '</section>';
         return html;
       }
@@ -823,7 +803,6 @@
         ((!draftId || state.verifyingAnswer || (done && done.correct)) ? ' disabled' : '') + '>' +
         (state.verifyingAnswer ? '<span class="spinner"></span> Tekshirilmoqda...' : '🔎 Javobni tekshirish') + '</button>' +
         '<button type="button" data-act="next" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-xs font-black"' + (state.activeQuestionIndex >= list.length - 1 ? ' disabled' : '') + '>Keyingi →</button></div>' +
-        '<p class="text-[11px] text-slate-500">Yorliqlar: 1–6 variant, Enter tekshirish, ← → savollar.</p>' +
         '</section>';
 
       html += '<section class="app-card rounded-3xl p-4"><div class="flex flex-wrap gap-1.5">' +
@@ -860,13 +839,13 @@
           '<div class="h-1.5 rounded-full bg-slate-900 overflow-hidden"><div class="h-full lemon-btn" style="width:' + sb.pct + '%"></div></div></div>').join('') + '</div>' : '') +
         '<div class="flex gap-2"><button type="button" data-act="reset-session" class="tactile-btn px-4 py-2 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">🔄 Sessiyani nollash</button></div></section>';
 
-      html += '<section class="app-card rounded-3xl p-5 space-y-3"><h2 class="text-base font-black lemon-title">🗂️ Serverdagi umumiy tarix (RLS)</h2>';
+      html += '<section class="app-card rounded-3xl p-5 space-y-3"><h2 class="text-base font-black lemon-title">🗂️ Serverdagi umumiy tarix</h2>';
       if (!state.session) {
-        html += '<p class="text-xs text-slate-300">Barcha urinishlaringizni bazada saqlash va ko\'rish uchun tizimga kiring.</p><button type="button" data-act="auth" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black">🔐 Kirish</button>';
+        html += '<p class="text-xs text-slate-300">Natijalaringizni saqlash va ko\'rish uchun tizimga kiring.</p><button type="button" data-act="auth" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black">🔐 Kirish / Ro\'yxat</button>';
       } else if (state.history === null) {
         html += '<p class="text-xs text-slate-300"><span class="spinner" style="border-color:rgba(190,242,100,.3);border-top-color:#bef264"></span> Yuklanmoqda...</p>';
       } else if (!state.history.length) {
-        html += '<p class="text-xs text-slate-300">Hozircha bazada urinishlar qayd etilmagan.</p>';
+        html += '<p class="text-xs text-slate-300">Hozircha bazada urinishlar yo\'q.</p>';
       } else {
         const total = state.history.length;
         const ok = state.history.filter(h => h.is_correct).length;
@@ -883,7 +862,7 @@
       return '<section class="app-card rounded-3xl p-10 text-center space-y-3 max-w-xl mx-auto">' +
         '<div class="text-6xl font-black text-rose-300">403</div>' +
         '<h1 class="text-xl font-black lemon-title">Ruxsat yo\'q</h1>' +
-        '<p class="text-sm text-slate-300">Bu bo\'lim faqat PostgreSQL <code>admins</code> jadvalida tasdiqlangan adminlar uchun.</p>' +
+        '<p class="text-sm text-slate-300">Bu bo\'lim faqat adminlar uchun.</p>' +
         '<button type="button" data-act="nav" data-view="quiz" class="lemon-btn px-5 py-2.5 rounded-xl text-xs font-black">← Testga qaytish</button></section>';
     }
 
@@ -943,11 +922,11 @@
             '<button type="button" data-act="rm-opt" data-i="' + i + '" class="tactile-btn px-2.5 py-2 rounded-xl bg-slate-900 text-rose-300 border border-slate-700 text-xs font-black"' + (d.options.length <= MIN_OPTIONS ? ' disabled' : '') + '>✕</button></div>').join('') +
           '<div class="flex flex-wrap gap-2 pt-1">' +
           '<button type="button" data-act="add-opt" class="tactile-btn px-3.5 py-2 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black"' + (d.options.length >= MAX_OPTIONS ? ' disabled' : '') + '>➕ Variant</button>' +
-          '<button class="lemon-btn flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-black">💾 Serverga Saqlash (RPC)</button></div></form></section>';
+          '<button class="lemon-btn flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-black">💾 Serverga Saqlash</button></div></form></section>';
 
         html += '<section class="app-card rounded-3xl p-5 space-y-3">' +
           '<div class="flex flex-wrap items-center justify-between gap-2"><h2 class="text-base font-black lemon-title">Barcha savollar (' + qList.length + ')</h2>' +
-          '<input data-search="admin-q" value="' + esc(state.adminSearch) + '" placeholder="🔍 Savol matni bo\'yicha qidirish..." class="field sm:max-w-xs" /></div>' +
+          '<input data-search="admin-q" value="' + esc(state.adminSearch) + '" placeholder="🔍 Savol bo\'yicha qidirish..." class="field sm:max-w-xs" /></div>' +
           '<ul class="divide-y divide-slate-800">' +
           (qList.map(q => {
             const s = state.subjects.find(x => x.id === q.subject_id);
@@ -988,9 +967,7 @@
     function openAuthSheet() {
       const s = $('jwt-auth-sheet');
       s.classList.remove('hidden'); s.classList.add('flex');
-      setAuthHint('');
-      if (state.supabaseUrl) $('supa-project-url').value = state.supabaseUrl;
-      if (state.supabaseAnonKey) $('supa-project-anon').value = state.supabaseAnonKey;
+      setAuthHint('', false);
     }
     function closeAuthSheet() {
       const s = $('jwt-auth-sheet');
@@ -1002,22 +979,11 @@
       await idbSet('ui_soft_day', state.softDayMode);
     }
 
-    async function connectSupabaseProject(e) {
-      e.preventDefault();
-      const ok = await initSupabaseClient($('supa-project-url').value, $('supa-project-anon').value);
-      if (ok) {
-        await syncCatalogFromSupabase();
-        setAuthHint('Baza ulandi! Endi kirish yoki ro\'yxatdan o\'tish mumkin.', false);
-        notify('Supabase muvaffaqiyatli ulandi.', 'success');
-      }
-      renderApp();
-    }
-
     async function submitJwtLogin(e) {
       e.preventDefault();
       if (state.authBusy) return;
       if (!await ensureConnected()) {
-        setAuthHint('Baza ulanmagan. Pastdagi "Baza ulanishi" qismidan URL va Key kiriting.', true);
+        setAuthHint('Baza bilan aloqa o\'rnatilmadi. Internetni tekshiring.', true);
         return;
       }
       const email = $('jwt-login-email').value.trim();
@@ -1044,7 +1010,7 @@
     async function signUpJwt() {
       if (state.authBusy) return;
       if (!await ensureConnected()) {
-        setAuthHint('Baza ulanmagan. Pastdagi "Baza ulanishi" qismidan URL va Key kiriting.', true);
+        setAuthHint('Baza bilan aloqa o\'rnatilmadi. Internetni tekshiring.', true);
         return;
       }
       const email = $('jwt-login-email').value.trim();
@@ -1074,8 +1040,8 @@
           closeAuthSheet();
           notify('Ro\'yxatdan o\'tdingiz va tizimga kirdingiz!', 'success');
         } else {
-          setAuthHint('Akkaunt yaratildi! Agar email tasdiqlash yoqilgan bo\'lsa, emailingizni tekshiring yoki kirish qiling.', false);
-          notify('Ro\'yxatdan o\'tish so\'rovi yuborildi.', 'success');
+          setAuthHint('Akkaunt yaratildi! Endi "Kirish" tugmasini bosing (agar email tasdiqlash yoqilgan bo\'lsa, emailingizni tekshiring).', false);
+          notify('Ro\'yxatdan o\'tish yakunlandi.', 'success');
         }
       } finally {
         setAuthBusy(false);
@@ -1295,14 +1261,14 @@
 
     window.addEventListener('online', async () => {
       updateNetworkBadge();
-      if (state.supabaseClient) { await syncCatalogFromSupabase(); renderApp(); }
+      if (await ensureConnected()) { await syncCatalogFromSupabase(); renderApp(); }
     });
     window.addEventListener('offline', () => { updateNetworkBadge(); notify('Offline rejim: keshlangan savollar ko\'rsatilmoqda.', 'warn'); });
     $('jwt-auth-sheet').addEventListener('click', e => { if (e.target.id === 'jwt-auth-sheet') closeAuthSheet(); });
 
     window.BilimXonaProd = {
       navigate, openAuthSheet, closeAuthSheet, toggleSoftDayMode,
-      connectSupabaseProject, submitJwtLogin, signUpJwt, logoutJwt
+      submitJwtLogin, signUpJwt, logoutJwt
     };
 
     (async function boot() {
@@ -1310,24 +1276,15 @@
       const soft = await idbGet('ui_soft_day');
       if (soft) { state.softDayMode = true; document.body.classList.add('soft-day-mode'); }
 
-      const cfg = await idbGet('supabase_config');
-      const url = (cfg && cfg.url) || DEFAULT_SUPABASE_URL;
-      const key = (cfg && cfg.anonKey) || DEFAULT_SUPABASE_ANON_KEY;
-
-      let connected = false;
-      if (url && key) connected = await initSupabaseClient(url, key);
-
-      if (connected) {
+      const ok = await initSupabaseClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY);
+      if (ok) {
         await syncCatalogFromSupabase();
       } else {
-        const had = await loadCatalogFromCache();
-        state.statusMessage = had
-          ? 'Saqlangan nusxa ko\'rsatilmoqda.'
-          : 'Baza hali ulanmagan. "Kirish / Ro\'yxat" tugmasini bosib "Baza ulanishi"ni kiriting.';
+        await loadCatalogFromCache();
       }
       renderApp();
     })();
   })();
   </script>
 </body>
-  </html>
+</html>
