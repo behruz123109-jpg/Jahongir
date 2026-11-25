@@ -264,3 +264,106 @@ grant execute on function public.is_admin() to anon, authenticated;
 -- insert into public.admins (user_id)
 -- select id from auth.users where email = 'SIZNING@EMAILINGIZ';
 -- ---------------------------------------------------------------------
+
+-- =====================================================================
+-- QO'SHIMCHA: imtihon natijalari, reyting, admin statistikasi
+-- =====================================================================
+create table if not exists public.exams (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  subject_id uuid references public.subjects(id) on delete set null,
+  topic_id uuid references public.topics(id) on delete set null,
+  total int not null check (total > 0),
+  correct int not null check (correct >= 0 and correct <= total),
+  percent numeric(5,2) not null check (percent >= 0 and percent <= 100),
+  duration_sec int not null default 0 check (duration_sec >= 0),
+  created_at timestamptz not null default now()
+);
+create index if not exists exams_user_idx on public.exams(user_id, created_at desc);
+create index if not exists exams_percent_idx on public.exams(percent desc);
+
+alter table public.exams enable row level security;
+
+drop policy if exists "exams_insert_own" on public.exams;
+create policy "exams_insert_own" on public.exams for insert
+  with check (auth.uid() = user_id and total >= 1);
+drop policy if exists "exams_select_own" on public.exams;
+create policy "exams_select_own" on public.exams for select using (auth.uid() = user_id);
+drop policy if exists "exams_admin_read" on public.exams;
+create policy "exams_admin_read" on public.exams for select using (public.is_admin());
+
+grant select, insert on public.exams to authenticated;
+grant usage on all sequences in schema public to authenticated;
+
+-- Reyting: kamida 5 savollik imtihonlar bo'yicha eng yaxshi natija.
+-- Ism o'rniga email boshi maskalanadi (maxfiylik).
+create or replace function public.leaderboard(p_limit int default 30)
+returns table (
+  pos int,
+  display_name text,
+  best_percent numeric,
+  exams_count int,
+  avg_percent numeric,
+  is_me boolean
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    dense_rank() over (order by max(e.percent) desc)::int,
+    left(split_part(coalesce(u.email, ''), '@', 1), 3) || '***',
+    max(e.percent),
+    count(*)::int,
+    round(avg(e.percent), 1),
+    (e.user_id = auth.uid())
+  from public.exams e
+  join auth.users u on u.id = e.user_id
+  where e.total >= 5
+  group by e.user_id, u.email
+  order by max(e.percent) desc, count(*) desc
+  limit least(greatest(coalesce(p_limit, 30), 1), 100);
+$$;
+revoke all on function public.leaderboard(int) from public;
+grant execute on function public.leaderboard(int) to anon, authenticated;
+
+-- Admin statistikasi
+create or replace function public.admin_stats()
+returns jsonb
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare v jsonb;
+begin
+  if not public.is_admin() then
+    raise exception 'forbidden' using errcode = '42501';
+  end if;
+  select jsonb_build_object(
+    'users', (select count(*) from auth.users),
+    'subjects', (select count(*) from public.subjects),
+    'topics', (select count(*) from public.topics),
+    'questions', (select count(*) from public.questions),
+    'active_questions', (select count(*) from public.questions),
+    'attempts_total', (select count(*) from public.attempts),
+    'attempts_7d', (select count(*) from public.attempts where created_at >= now() - interval '7 days'),
+    'exams_total', (select count(*) from public.exams),
+    'avg_percent', (select round(coalesce(avg(percent), 0), 1) from public.exams),
+    'daily', (
+      select coalesce(jsonb_agg(jsonb_build_object('day', d::date, 'count', coalesce(c.n, 0)) order by d), '[]'::jsonb)
+      from generate_series(current_date - 6, current_date, interval '1 day') d
+      left join (
+        select created_at::date as day, count(*) as n
+        from public.attempts
+        where created_at >= current_date - 6
+        group by 1
+      ) c on c.day = d::date
+    )
+  ) into v;
+  return v;
+end;
+$$;
+revoke all on function public.admin_stats() from public, anon;
+grant execute on function public.admin_stats() to authenticated;
