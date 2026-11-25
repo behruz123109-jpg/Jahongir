@@ -2,22 +2,20 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0b1221" />
-  <meta name="description" content="BilimXona — Supabase Auth JWT, PostgreSQL RLS va server RPC asosida ishlovchi xavfsiz onlayn test va imtihon platformasi." />
+  <meta name="description" content="BilimXona — onlayn test va imtihon platformasi. Javoblar serverda tekshiriladi." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231d4ed8'/%3E%3Cpath d='M18 33l10 10 20-22' fill='none' stroke='%23bef264' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
   <title>BilimXona — Test va Imtihon Platformasi</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <style>
-    * {
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
     :root {
       --bg-obsidian: #030508;
       --bg-midnight: #060911;
@@ -26,6 +24,7 @@
       --border-subtle: rgba(148, 163, 184, 0.16);
       --text-primary: #e8f1ff;
       --lemon-soft: #d9f99d;
+      color-scheme: dark;
     }
     body.soft-day-mode {
       --bg-obsidian: #151d30;
@@ -44,14 +43,14 @@
       color: var(--text-primary);
       min-height: 100vh;
       overflow-x: hidden;
+      padding-bottom: 6rem;
     }
+    @media (min-width: 640px) { body { padding-bottom: 3rem; } }
+    .hidden { display: none !important; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
     .main-menu-shell {
-      background: linear-gradient(90deg,
-        rgba(124, 45, 18, 0.92) 0%, rgba(14, 116, 144, 0.92) 22%,
-        rgba(29, 78, 216, 0.98) 50%, rgba(67, 56, 202, 0.94) 78%, rgba(6, 95, 70, 0.92) 100%);
+      background: linear-gradient(90deg, rgba(124, 45, 18, 0.92) 0%, rgba(14, 116, 144, 0.92) 22%, rgba(29, 78, 216, 0.98) 50%, rgba(67, 56, 202, 0.94) 78%, rgba(6, 95, 70, 0.92) 100%);
       border-bottom: 1px solid rgba(190, 242, 100, 0.28);
       box-shadow: 0 12px 34px rgba(2, 6, 23, 0.8), 0 0 46px rgba(37, 99, 235, 0.28);
       backdrop-filter: blur(12px);
@@ -60,9 +59,8 @@
       background: var(--surface-card);
       border: 1px solid var(--border-subtle);
       box-shadow: 0 16px 36px rgba(2, 6, 23, 0.68), inset 0 1px 0 rgba(190, 242, 100, 0.08);
-      transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.2s ease;
+      border-radius: 1.5rem;
     }
-    .app-card:hover { border-color: rgba(190, 242, 100, 0.36); }
     .lemon-title { color: var(--lemon-soft); text-shadow: 0 0 18px rgba(163, 230, 53, 0.16); }
     .lemon-btn {
       background: linear-gradient(135deg, #d9f99d 0%, #bef264 45%, #a3e635 85%, #84cc16 100%);
@@ -70,24 +68,18 @@
       border: 1px solid rgba(217, 249, 157, 0.72);
       box-shadow: 0 6px 20px rgba(132, 204, 22, 0.26);
       transition: transform 0.14s ease, filter 0.16s ease, opacity 0.16s ease;
+      cursor: pointer;
     }
     .lemon-btn:hover:not(:disabled) { filter: brightness(1.06); }
     .lemon-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .lemon-btn:active:not(:disabled), .tactile-btn:active:not(:disabled) { transform: scale(0.96); }
-    .tactile-btn { transition: transform 0.14s ease, background-color 0.16s ease, border-color 0.16s ease; }
+    .tactile-btn { transition: transform 0.14s ease, background-color 0.16s ease, border-color 0.16s ease; cursor: pointer; }
     .tactile-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .lemon-pill {
-      background: rgba(163, 230, 53, 0.14); color: #d9f99d;
-      border: 1px solid rgba(190, 242, 100, 0.35);
-    }
+    .lemon-btn:active:not(:disabled), .tactile-btn:active:not(:disabled) { transform: scale(0.96); }
+    .lemon-pill { background: rgba(163, 230, 53, 0.14); color: #d9f99d; border: 1px solid rgba(190, 242, 100, 0.35); }
     .bottom-sheet-panel {
       background: linear-gradient(180deg, #0d1629 0%, #060911 100%);
       border: 1px solid rgba(190, 242, 100, 0.26);
       box-shadow: 0 -14px 45px rgba(0, 0, 0, 0.85), 0 0 42px rgba(29, 78, 216, 0.24);
-    }
-    .app-footer {
-      background: linear-gradient(180deg, #04070d 0%, #020306 100%);
-      border-top: 1px solid rgba(148, 163, 184, 0.14);
     }
     .field {
       width: 100%; padding: 0.65rem 0.875rem; border-radius: 0.75rem;
@@ -95,7 +87,10 @@
       font-size: 0.8rem; outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .field:focus { border-color: #a3e635; box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.12); }
-    .opt-btn { transition: transform 0.14s ease, border-color 0.15s ease, background-color 0.15s ease; }
+    .field::placeholder { color: #64748b; }
+    .field:disabled { opacity: 0.5; }
+    textarea.field { resize: vertical; }
+    .opt-btn { transition: transform 0.14s ease, border-color 0.15s ease, background-color 0.15s ease; cursor: pointer; }
     .opt-btn:hover:not(:disabled) { border-color: rgba(190, 242, 100, 0.55); transform: translateY(-1px); }
     .opt-btn:disabled { cursor: default; }
     .spinner {
@@ -103,202 +98,123 @@
       border: 2px solid rgba(7, 17, 5, 0.25); border-top-color: #071105;
       animation: spin 0.7s linear infinite; vertical-align: -2px;
     }
+    .spinner-lime { border-color: rgba(190, 242, 100, 0.3); border-top-color: #bef264; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .ring { width: 132px; height: 132px; border-radius: 9999px; display: grid; place-items: center; }
+    .ring-inner { width: 104px; height: 104px; border-radius: 9999px; background: #060911; display: grid; place-items: center; }
+    input[type="checkbox"], input[type="radio"] { accent-color: #a3e635; }
     :focus-visible { outline: 2px solid #a3e635; outline-offset: 2px; }
     @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   </style>
 </head>
-<body class="pb-24 sm:pb-12">
-  <div id="bilimxona-prod-app" class="min-h-screen flex flex-col justify-between">
+<body>
+  <noscript><div style="padding:24px;color:#e8f1ff;background:#030508;font-family:sans-serif">Bu sayt ishlashi uchun JavaScript yoqilgan bo'lishi kerak.</div></noscript>
+
+  <div class="min-h-screen flex flex-col justify-between">
     <div>
       <header class="main-menu-shell sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 space-y-2.5">
+        <div class="max-w-6xl mx-auto px-3 sm:px-6 py-3 space-y-2.5">
           <div class="flex flex-wrap items-center justify-between gap-2.5">
-            <button type="button" onclick="BilimXonaProd.navigate('quiz')" class="tactile-btn flex items-center gap-2.5 text-left">
-              <div class="w-11 h-11 rounded-2xl bg-slate-950/90 border border-lime-300/45 flex items-center justify-center text-2xl shadow-lg">🛡️</div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-lg sm:text-xl font-black lemon-title tracking-tight">BilimXona</span>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-lime-300/20 text-lime-200 border border-lime-300/40">Online</span>
-                </div>
-                <p id="jwt-session-banner" class="text-[11px] text-slate-200/90 font-semibold">Ulanmoqda...</p>
-              </div>
+            <button type="button" data-act="nav" data-view="quiz" class="tactile-btn flex items-center gap-2.5 text-left" aria-label="Bosh sahifa">
+              <span class="w-11 h-11 rounded-2xl bg-slate-950/90 border border-lime-300/45 flex items-center justify-center text-2xl shadow-lg" aria-hidden="true">🛡️</span>
+              <span>
+                <span class="block text-lg sm:text-xl font-black lemon-title tracking-tight leading-tight">BilimXona</span>
+                <span id="session-banner" class="block text-[11px] text-slate-200/90 font-semibold">Ulanmoqda...</span>
+              </span>
             </button>
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <span id="exam-timer-pill" class="hidden px-2.5 py-1.5 rounded-xl bg-amber-950/90 text-amber-200 border border-amber-400/45 text-[11px] font-black">⏱️ 00:00</span>
-              <span id="network-mode-pill" class="px-2.5 py-1.5 rounded-xl bg-slate-950/80 text-sky-200 border border-sky-300/30 text-[11px] font-extrabold">🌐 Tarmoq</span>
-              <button type="button" id="auth-header-btn" onclick="BilimXonaProd.openAuthSheet()" class="lemon-btn px-3 py-1.5 rounded-xl text-xs font-black">🔐 Kirish / Ro'yxat</button>
-              <button type="button" onclick="BilimXonaProd.toggleSoftDayMode()" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-950/85 hover:bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-extrabold" title="Rejimni almashtirish">🌓</button>
+              <span id="exam-pill" class="hidden px-2.5 py-1.5 rounded-xl bg-amber-950/90 text-amber-200 border border-amber-400/45 text-[11px] font-black tabular-nums">⏱️ 00:00</span>
+              <span id="network-pill" class="px-2.5 py-1.5 rounded-xl bg-slate-950/80 text-sky-200 border border-sky-300/30 text-[11px] font-extrabold">🌐</span>
+              <button type="button" id="auth-btn" data-act="auth" class="lemon-btn px-3 py-1.5 rounded-xl text-xs font-black">🔐 Kirish</button>
+              <button type="button" data-act="theme" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-950/85 hover:bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-extrabold" aria-label="Rejimni almashtirish">🌓</button>
             </div>
           </div>
-          <nav id="prod-nav-tabs" aria-label="Asosiy bo'limlar" class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-0.5"></nav>
+          <nav id="top-nav" aria-label="Asosiy bo'limlar" class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-0.5"></nav>
         </div>
       </header>
-      <main id="prod-main-view" class="max-w-7xl mx-auto px-3 sm:px-6 py-5 space-y-5"></main>
+
+      <main id="view" class="max-w-6xl mx-auto px-3 sm:px-6 py-5 space-y-5"></main>
     </div>
 
-    <nav aria-label="Tezkor mobil navigatsiya" class="fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-lime-300/20 px-2 py-1.5 sm:hidden">
-      <div id="prod-mobile-dock" class="grid grid-cols-4 gap-1 max-w-md mx-auto"></div>
+    <nav aria-label="Tezkor navigatsiya" class="fixed bottom-0 inset-x-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-lime-300/20 px-2 py-1.5 sm:hidden">
+      <div id="dock" class="grid grid-cols-4 gap-1 max-w-md mx-auto"></div>
     </nav>
 
-    <footer class="app-footer mt-12 py-6 px-4 text-xs text-slate-400">
-      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div><strong class="lemon-title">BilimXona</strong> — Supabase Auth JWT + PostgreSQL RLS + RPC <code class="text-lime-300">verify_answer</code></div>
-        <div class="text-[11px] text-lime-300/85 font-semibold">Xavfsiz Test va Boshqaruv Tizimi</div>
+    <footer class="mt-12 py-6 px-4 text-xs text-slate-400 border-t border-slate-800">
+      <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div><strong class="lemon-title">BilimXona</strong> — onlayn test va imtihon</div>
+        <div class="text-[11px] text-lime-300/85 font-semibold">Javoblar serverda tekshiriladi</div>
       </div>
     </footer>
   </div>
 
-  <div id="prod-toast-stack" class="fixed top-20 right-3 sm:right-6 z-50 flex flex-col gap-2 max-w-sm pointer-events-none" aria-live="polite"></div>
+  <div id="toasts" class="fixed top-24 right-3 sm:right-6 z-[60] flex flex-col gap-2 max-w-sm pointer-events-none" aria-live="polite"></div>
 
-  <div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4" role="dialog" aria-modal="true">
+  <!-- Tasdiqlash oynasi -->
+  <div id="confirm-modal" class="fixed inset-0 z-[55] hidden items-center justify-center bg-slate-950/85 backdrop-blur-sm p-4" role="dialog" aria-modal="true">
     <div class="bottom-sheet-panel w-full max-w-md rounded-3xl p-5 space-y-4">
       <div class="text-base font-black lemon-title" id="confirm-title">Tasdiqlash</div>
       <p class="text-xs text-slate-300 leading-relaxed" id="confirm-text"></p>
       <div class="flex justify-end gap-2">
         <button type="button" id="confirm-no" class="tactile-btn px-4 py-2 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-xs font-black">Bekor qilish</button>
-        <button type="button" id="confirm-yes" class="tactile-btn px-4 py-2 rounded-xl bg-rose-600 text-slate-100 border border-rose-400/50 text-xs font-black">Ha, o'chirilsin</button>
+        <button type="button" id="confirm-yes" class="tactile-btn px-4 py-2 rounded-xl bg-rose-600 text-slate-100 border border-rose-400/50 text-xs font-black">Ha</button>
       </div>
     </div>
   </div>
 
-  <div id="jwt-auth-sheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-slate-950/85 backdrop-blur-sm p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Kirish va ro'yxatdan o'tish">
-    <div class="bottom-sheet-panel w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 max-h-[90vh] overflow-y-auto space-y-5">
+  <!-- Kirish sheet -->
+  <div id="auth-sheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-slate-950/85 backdrop-blur-sm p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Kirish">
+    <div class="bottom-sheet-panel w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 max-h-[92vh] overflow-y-auto space-y-4">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <div>
-          <span class="lemon-pill px-2.5 py-0.5 rounded-full text-[11px] font-black">🔐 Akkaunt</span>
-          <h2 class="text-xl font-black lemon-title mt-1">Kirish / Ro'yxatdan O'tish</h2>
-        </div>
-        <button type="button" onclick="BilimXonaProd.closeAuthSheet()" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-lime-300 border border-slate-700 text-xs font-black">✕ Yopish</button>
+        <h2 class="text-lg font-black lemon-title">Akkaunt</h2>
+        <button type="button" data-act="auth-close" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-lime-300 border border-slate-700 text-xs font-black" aria-label="Yopish">✕</button>
       </div>
 
-      <form onsubmit="BilimXonaProd.submitJwtLogin(event)" class="space-y-3 bg-slate-950/80 p-4 rounded-2xl border border-slate-800">
-        <div class="text-xs font-black text-lime-300">Email va parol kiriting (parol kamida 6 belgi)</div>
-        <input id="jwt-login-email" type="email" required autocomplete="email" placeholder="sizning@email.uz" class="field" />
-        <input id="jwt-login-password" type="password" required minlength="6" autocomplete="current-password" placeholder="Parol (kamida 6 belgi)" class="field" />
-        <div id="auth-status-hint" class="text-[11px] min-h-[16px] font-bold"></div>
+      <form id="login-form" data-form="login" class="space-y-3">
+        <input id="login-email" name="email" type="email" required autocomplete="email" placeholder="Email" class="field" />
+        <input id="login-password" name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Parol (kamida 6 belgi)" class="field" />
         <div class="flex flex-wrap gap-2">
-          <button type="submit" id="auth-submit-btn" class="lemon-btn flex-1 min-w-[130px] py-2.5 rounded-xl text-xs font-black">✅ Kirish</button>
-          <button type="button" id="auth-signup-btn" onclick="BilimXonaProd.signUpJwt()" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">📝 Ro'yxatdan o'tish</button>
-          <button type="button" onclick="BilimXonaProd.logoutJwt()" class="tactile-btn px-4 py-2.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-xs font-black">Chiqish</button>
+          <button type="submit" id="login-btn" class="lemon-btn flex-1 min-w-[120px] py-2.5 rounded-xl text-xs font-black">✅ Kirish</button>
+          <button type="button" id="signup-btn" data-act="signup" class="tactile-btn flex-1 min-w-[140px] py-2.5 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">📝 Ro'yxatdan o'tish</button>
         </div>
+        <button type="button" data-act="reset" class="text-[11px] font-bold text-sky-300 underline underline-offset-2">Parolni unutdingizmi?</button>
+        <div id="auth-hint" class="text-[11px] min-h-[16px] font-bold"></div>
       </form>
+
+      <div id="logged-box" class="hidden space-y-3">
+        <div class="rounded-2xl bg-slate-950/80 border border-slate-800 p-3 text-xs">
+          <div class="font-black text-lime-300" id="logged-email">—</div>
+          <div class="text-slate-400 mt-1" id="logged-role">—</div>
+        </div>
+        <button type="button" data-act="logout" class="tactile-btn w-full py-2.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-xs font-black">Chiqish</button>
+      </div>
     </div>
   </div>
+
+  <!-- Savol muharriri (admin, modal) -->
+  <div id="editor-sheet" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-slate-950/85 backdrop-blur-sm p-0 sm:p-4" role="dialog" aria-modal="true" aria-label="Savol muharriri"></div>
 
   <script>
   (function () {
     'use strict';
 
-    const DEFAULT_SUPABASE_URL = 'https://mfonyhivgisrrgfumrqm.supabase.co';
-    const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_y1QrN9WVmcLz-1SrFRxliw_q0_w7ixh';
-
-    const IDB_NAME = 'bilimxona_enterprise_v3';
-    const IDB_STORE = 'runtime_cache';
-    const MAX_OPTIONS = 6;
+    /* ================================================================
+     * SOZLAMALAR. Anon (publishable) kalit ochiq bo'lishi mumkin:
+     * ma'lumotlar himoyasi RLS va server funksiyalari orqali.
+     * service_role kalitni HECH QACHON bu yerga qo'ymang.
+     * ================================================================ */
+    const SUPABASE_URL = 'https://mfonyhivgisrrgfumrqm.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_y1QrN9WVmcLz-1SrFRxliw_q0_w7ixh';
+    const PASS_PERCENT = 60;
+    const EXAM_SECONDS_PER_QUESTION = 60;
     const MIN_OPTIONS = 2;
+    const MAX_OPTIONS = 6;
+    const ADMIN_LIST_LIMIT = 200;
+    const IDB_NAME = 'bilimxona_app_v4';
+    const IDB_STORE = 'runtime_cache';
 
-    const uuid = () => (crypto && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-          const r = Math.random() * 16 | 0;
-          return (c === 'x' ? r : (r & 3 | 8)).toString(16);
-        });
-
-    function shuffleArray(arr) {
-      const a = arr.slice();
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
-    }
-
-    function blankDraft(subjectId, topicId) {
-      const opts = [0, 1, 2, 3].map(() => ({ id: uuid(), label: '' }));
-      return {
-        subject_id: subjectId || '',
-        topic_id: topicId || '',
-        prompt: '',
-        image_url: '',
-        explanation: '',
-        options: opts,
-        correct_answer_id: opts[0].id
-      };
-    }
-
-    const state = {
-      view: 'quiz',
-      adminTab: 'subjects',
-      adminSearch: '',
-      softDayMode: false,
-      supabaseClient: null,
-      authSub: null,
-      supabaseUrl: DEFAULT_SUPABASE_URL,
-      supabaseAnonKey: DEFAULT_SUPABASE_ANON_KEY,
-      session: null,
-      userId: null,
-      userEmail: '',
-      isServerAdmin: false,
-      authBusy: false,
-      loading: false,
-      subjects: [],
-      topics: [],
-      questions: [],
-      displayOrder: [],
-      shuffledOptionsMap: {},
-      selectedSubjectId: '',
-      selectedTopicId: '',
-      activeQuestionIndex: 0,
-      draftSelections: {},
-      answers: {},
-      verifyingAnswer: false,
-      examMode: false,
-      examSecondsLeft: 0,
-      examInterval: null,
-      history: null,
-      editingQuestionId: null,
-      editingDraft: blankDraft(),
-      statusMessage: 'Ma\'lumotlar yuklanmoqda...'
-    };
-
+    /* ---------------- Yordamchilar ---------------- */
     const $ = id => document.getElementById(id);
-
-    let dbPromise = null;
-    function openMetaDb() {
-      if (dbPromise) return dbPromise;
-      dbPromise = new Promise((resolve, reject) => {
-        if (!('indexedDB' in window)) return reject(new Error('IndexedDB mavjud emas'));
-        const req = indexedDB.open(IDB_NAME, 1);
-        req.onupgradeneeded = () => {
-          const db = req.result;
-          if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE, { keyPath: 'key' });
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => { dbPromise = null; reject(req.error); };
-      });
-      return dbPromise;
-    }
-    async function idbGet(key) {
-      try {
-        const db = await openMetaDb();
-        return await new Promise(resolve => {
-          const r = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
-          r.onsuccess = () => resolve(r.result ? r.result.value : null);
-          r.onerror = () => resolve(null);
-        });
-      } catch (_) { return null; }
-    }
-    async function idbSet(key, value) {
-      try {
-        const db = await openMetaDb();
-        await new Promise((resolve, reject) => {
-          const r = db.transaction(IDB_STORE, 'readwrite').objectStore(IDB_STORE).put({ key, value, updatedAt: Date.now() });
-          r.onsuccess = () => resolve();
-          r.onerror = () => reject(r.error);
-        });
-      } catch (_) {}
-    }
 
     function esc(str) {
       return String(str == null ? '' : str)
@@ -311,28 +227,43 @@
         return (x.protocol === 'https:' || x.protocol === 'http:') ? x.href : '';
       } catch (_) { return ''; }
     }
+    function uuid() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 3 | 8)).toString(16);
+      });
+    }
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    }
+    function fmtClock(sec) {
+      sec = Math.max(0, sec | 0);
+      return String(Math.floor(sec / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+    }
+    function fmtDate(iso) {
+      try { return new Date(iso).toLocaleString('uz-UZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+      catch (_) { return ''; }
+    }
     function errMsg(e) {
-      if (!e) return 'Noma\'lum xatolik';
-      const raw = e.message || String(e);
-      if (e.code === '42501' || /forbidden|permission denied|row-level security/i.test(raw)) {
-        return 'Ruxsat yo\'q (403): bu amal faqat adminlar uchun.';
-      }
-      if (/invalid login credentials/i.test(raw)) {
-        return 'Email yoki parol noto\'g\'ri.';
-      }
-      if (/user already registered/i.test(raw)) {
-        return 'Bu email bilan allaqachon ro\'yxatdan o\'tilgan. "Kirish" tugmasini bosing.';
-      }
-      if (/password should be at least/i.test(raw)) {
-        return 'Parol kamida 6 ta belgidan iborat bo\'lishi kerak.';
-      }
-      if (/relation .* does not exist/i.test(raw)) {
-        return 'Baza jadvallari hali yaratilmagan. Supabase SQL Editor da schema.sql ni ishga tushiring.';
-      }
+      const raw = (e && (e.message || e.error_description)) || String(e || 'Noma\'lum xatolik');
+      if ((e && e.code === '42501') || /forbidden|permission denied|row-level security/i.test(raw)) return 'Ruxsat yo\'q (403): bu amal faqat adminlar uchun yoki tizimga kirish kerak.';
+      if (/invalid login credentials/i.test(raw)) return 'Email yoki parol noto\'g\'ri.';
+      if (/email not confirmed/i.test(raw)) return 'Email hali tasdiqlanmagan. Pochtangizdagi havolani bosing.';
+      if (/user already registered/i.test(raw)) return 'Bu email allaqachon ro\'yxatdan o\'tgan. "Kirish" ni bosing.';
+      if (/password should be at least/i.test(raw)) return 'Parol kamida 6 belgi bo\'lishi kerak.';
+      if (/failed to fetch|networkerror|load failed/i.test(raw)) return 'Tarmoq xatosi. Internetni tekshiring.';
+      if (/savol topilmadi/i.test(raw)) return 'Savol topilmadi. Sahifani yangilang.';
       return raw;
     }
+
     function notify(text, level) {
-      const stack = $('prod-toast-stack');
+      const stack = $('toasts');
       if (!stack) return;
       const styles = {
         success: 'bg-emerald-950/95 text-lime-200 border-lime-300/45',
@@ -345,178 +276,108 @@
       el.textContent = text;
       stack.appendChild(el);
       if (window.gsap) gsap.fromTo(el, { y: -10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2 });
-      setTimeout(() => el.remove(), 3500);
+      setTimeout(() => el.remove(), 3800);
     }
-    function setAuthHint(msg, isErr) {
-      const el = $('auth-status-hint');
-      if (!el) return;
-      el.textContent = msg || '';
-      el.className = 'text-[11px] min-h-[16px] font-bold ' + (isErr ? 'text-rose-300' : 'text-lime-300');
-    }
-    function setAuthBusy(busy) {
-      state.authBusy = busy;
-      const b1 = $('auth-submit-btn');
-      const b2 = $('auth-signup-btn');
-      if (b1) b1.disabled = busy;
-      if (b2) b2.disabled = busy;
-    }
+
     function askConfirm(text, title) {
       return new Promise(resolve => {
         const modal = $('confirm-modal');
         $('confirm-title').textContent = title || 'Tasdiqlash';
         $('confirm-text').textContent = text;
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        const cleanup = res => {
-          modal.classList.add('hidden');
-          modal.classList.remove('flex');
-          $('confirm-yes').onclick = null;
-          $('confirm-no').onclick = null;
-          resolve(res);
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+        const done = v => {
+          modal.classList.add('hidden'); modal.classList.remove('flex');
+          $('confirm-yes').onclick = null; $('confirm-no').onclick = null;
+          resolve(v);
         };
-        $('confirm-yes').onclick = () => cleanup(true);
-        $('confirm-no').onclick = () => cleanup(false);
+        $('confirm-yes').onclick = () => done(true);
+        $('confirm-no').onclick = () => done(false);
       });
     }
 
-    function updateNetworkBadge() {
-      const el = $('network-mode-pill');
-      if (!el) return;
-      const base = 'px-2.5 py-1.5 rounded-xl border text-[11px] font-extrabold ';
-      if (!navigator.onLine) {
-        el.textContent = '📴 Offline';
-        el.className = base + 'bg-amber-950/90 text-amber-200 border-amber-400/40';
-      } else if (state.supabaseClient) {
-        el.textContent = '☁️ Ulangan';
-        el.className = base + 'bg-emerald-950/90 text-lime-200 border-lime-300/40';
-      } else {
-        el.textContent = '🔌 Ulanmoqda';
-        el.className = base + 'bg-slate-950/85 text-sky-200 border-sky-300/30';
-      }
-    }
-    function updateJwtBanner() {
-      const b = $('jwt-session-banner');
-      const btn = $('auth-header-btn');
-      if (b) {
-        b.textContent = (state.session && state.userEmail)
-          ? state.userEmail + ' • ' + (state.isServerAdmin ? 'ADMIN' : 'Foydalanuvchi')
-          : 'Mehmon rejimi • Kirish yoki ro\'yxatdan o\'tish mumkin';
-      }
-      if (btn) {
-        btn.textContent = (state.session && state.userEmail) ? '👤 ' + state.userEmail.split('@')[0] : '🔐 Kirish / Ro\'yxat';
-      }
+    function setAuthHint(msg, isErr) {
+      const el = $('auth-hint');
+      el.textContent = msg || '';
+      el.className = 'text-[11px] min-h-[16px] font-bold ' + (isErr ? 'text-rose-300' : 'text-lime-300');
     }
 
-    function formatSeconds(sec) {
-      const m = String(Math.floor(sec / 60)).padStart(2, '0');
-      const s = String(sec % 60).padStart(2, '0');
-      return m + ':' + s;
+    /* ---------------- IndexedDB (kesh, localStorage emas) ---------------- */
+    let dbPromise = null;
+    function openDb() {
+      if (dbPromise) return dbPromise;
+      dbPromise = new Promise((resolve, reject) => {
+        if (!('indexedDB' in window)) return reject(new Error('IndexedDB yo\'q'));
+        const req = indexedDB.open(IDB_NAME, 1);
+        req.onupgradeneeded = () => {
+          if (!req.result.objectStoreNames.contains(IDB_STORE)) req.result.createObjectStore(IDB_STORE, { keyPath: 'key' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => { dbPromise = null; reject(req.error); };
+      });
+      return dbPromise;
     }
-    function startExamMode() {
-      const list = filteredQuestions();
-      if (!list.length) return notify('Imtihon uchun savollar mavjud emas.', 'warn');
-      stopExamMode(true);
-      state.answers = {};
-      state.draftSelections = {};
-      state.activeQuestionIndex = 0;
-      shuffleSession();
-      state.examMode = true;
-      state.examSecondsLeft = list.length * 60;
-      const pill = $('exam-timer-pill');
-      pill.classList.remove('hidden');
-      pill.textContent = '⏱️ ' + formatSeconds(state.examSecondsLeft);
-
-      state.examInterval = setInterval(() => {
-        state.examSecondsLeft--;
-        pill.textContent = '⏱️ ' + formatSeconds(Math.max(0, state.examSecondsLeft));
-        if (state.examSecondsLeft <= 30) {
-          pill.classList.add('animate-pulse', 'text-rose-200', 'border-rose-400');
-        }
-        if (state.examSecondsLeft <= 0) {
-          stopExamMode(false);
-          notify('⏰ Imtihon vaqti tugadi! Natijalaringiz tayyor.', 'warn');
-          navigate('results');
-        }
-      }, 1000);
-      notify('⏱️ Imtihon boshlandi (' + list.length + ' daqiqa)!', 'info');
-      renderApp();
-    }
-    function stopExamMode(silent) {
-      if (state.examInterval) clearInterval(state.examInterval);
-      state.examInterval = null;
-      state.examMode = false;
-      const pill = $('exam-timer-pill');
-      if (pill) {
-        pill.classList.add('hidden');
-        pill.classList.remove('animate-pulse', 'text-rose-200', 'border-rose-400');
-      }
-      if (!silent) renderApp();
-    }
-
-    async function initSupabaseClient(url, anonKey) {
-      const cleanUrl = (url || '').trim();
-      const cleanKey = (anonKey || '').trim();
-      if (!cleanUrl || !cleanKey) return false;
-      if (!window.supabase || !window.supabase.createClient) {
-        notify('Kutubxona yuklanmadi. Internetni tekshiring.', 'error');
-        return false;
-      }
+    async function idbGet(key) {
       try {
-        if (state.authSub) { state.authSub.unsubscribe(); state.authSub = null; }
-        state.supabaseUrl = cleanUrl;
-        state.supabaseAnonKey = cleanKey;
-        state.supabaseClient = window.supabase.createClient(cleanUrl, cleanKey, {
-          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        const db = await openDb();
+        return await new Promise(resolve => {
+          const r = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(key);
+          r.onsuccess = () => resolve(r.result ? r.result.value : null);
+          r.onerror = () => resolve(null);
         });
-
-        const { data } = await state.supabaseClient.auth.getSession();
-        await applyJwtSession(data && data.session ? data.session : null);
-
-        const sub = state.supabaseClient.auth.onAuthStateChange((event, nextSession) => {
-          setTimeout(async () => {
-            if (event === 'INITIAL_SESSION') return;
-            await applyJwtSession(nextSession);
-            if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
-              await syncCatalogFromSupabase();
-            }
-            renderApp();
-          }, 0);
-        });
-        state.authSub = sub.data.subscription;
-        return true;
-      } catch (e) {
-        state.supabaseClient = null;
-        notify('Ulanishda xatolik: ' + errMsg(e), 'error');
-        return false;
-      }
+      } catch (_) { return null; }
     }
-
-    async function ensureConnected() {
-      if (state.supabaseClient) return true;
-      return await initSupabaseClient(state.supabaseUrl, state.supabaseAnonKey);
-    }
-
-    async function applyJwtSession(session) {
-      state.session = session || null;
-      state.userId = session && session.user ? session.user.id : null;
-      state.userEmail = session && session.user ? (session.user.email || '') : '';
-      state.history = null;
-      await checkAdminViaRpc();
-      if (!state.isServerAdmin && state.view === 'admin') state.view = 'quiz';
-    }
-
-    async function checkAdminViaRpc() {
-      if (!state.supabaseClient || !state.session || !state.session.access_token) {
-        state.isServerAdmin = false;
-        return false;
-      }
+    async function idbSet(key, value) {
       try {
-        const { data, error } = await state.supabaseClient.rpc('is_admin');
-        state.isServerAdmin = !error && data === true;
-      } catch (_) { state.isServerAdmin = false; }
-      return state.isServerAdmin;
+        const db = await openDb();
+        await new Promise((resolve, reject) => {
+          const r = db.transaction(IDB_STORE, 'readwrite').objectStore(IDB_STORE).put({ key, value, updatedAt: Date.now() });
+          r.onsuccess = () => resolve();
+          r.onerror = () => reject(r.error);
+        });
+      } catch (_) { /* kesh ixtiyoriy */ }
     }
 
+    /* ---------------- Holat ---------------- */
+    function blankDraft(subjectId, topicId) {
+      const opts = [0, 1, 2, 3].map(() => ({ id: uuid(), label: '' }));
+      return {
+        id: null, subject_id: subjectId || '', topic_id: topicId || '',
+        prompt: '', image_url: '', explanation: '', options: opts, correct_answer_id: opts[0].id
+      };
+    }
+
+    const state = {
+      view: 'quiz',
+      adminTab: 'subjects',
+      soft: false,
+      sb: null,
+      session: null,
+      userId: null,
+      userEmail: '',
+      isAdmin: false,
+      loading: true,
+      statusMessage: 'Ma\'lumotlar yuklanmoqda...',
+      subjects: [],
+      topics: [],
+      questions: [],
+      displayOrder: [],
+      optCache: {},
+      subjectId: '',
+      topicId: '',
+      shuffle: false,
+      idx: 0,
+      picks: {},          // mashq: qid -> tanlangan variant (tekshirilmagan)
+      answers: {},        // mashq: qid -> { correct, explanation, picked, attempts }
+      verifying: false,
+      exam: { active: false, ids: [], left: 0, timer: null, startedAt: 0, submitting: false, picks: {} },
+      lastExam: null,     // oxirgi imtihon natijasi (xotirada)
+      history: null,      // serverdagi urinishlar
+      leaderboard: null,
+      adminSearch: '',
+      editor: null        // admin: savol formasi (modal) holati
+    };
+
+    /* ---------------- Katalog ---------------- */
     function normalizeQuestions(rows) {
       return (rows || []).map(q => ({
         id: q.id,
@@ -524,44 +385,63 @@
         topic_id: q.topic_id || '',
         prompt: q.prompt,
         image_url: q.image_url || '',
-        options: (q.answers || [])
-          .slice()
+        created_at: q.created_at || '',
+        options: (q.answers || []).slice()
           .sort((a, b) => (a.position || 0) - (b.position || 0))
           .map(a => ({ id: a.id, label: a.label }))
       }));
     }
-
-    function rebuildOrder(doShuffle) {
+    function rebuildOrder() {
       const ids = state.questions.map(q => q.id);
-      state.displayOrder = doShuffle ? shuffleArray(ids) : ids;
-      state.shuffledOptionsMap = {};
-      state.questions.forEach(q => {
-        state.shuffledOptionsMap[q.id] = doShuffle ? shuffleArray(q.options) : q.options;
-      });
+      state.displayOrder = state.shuffle ? shuffleArray(ids) : ids;
+      state.optCache = {};
+    }
+    function optionsFor(q) {
+      if (!state.shuffle) return q.options;
+      if (!state.optCache[q.id]) state.optCache[q.id] = shuffleArray(q.options);
+      return state.optCache[q.id];
+    }
+    function questionById(id) { return state.questions.find(q => q.id === id) || null; }
+    function subjectName(id) { const s = state.subjects.find(x => x.id === id); return s ? s.name : '—'; }
+    function topicName(id) { const t = state.topics.find(x => x.id === id); return t ? t.name : ''; }
+
+    function filteredQuestions() {
+      const map = new Map(state.questions.map(q => [q.id, q]));
+      return state.displayOrder.map(id => map.get(id)).filter(Boolean).filter(q =>
+        (!state.subjectId || q.subject_id === state.subjectId) &&
+        (!state.topicId || q.topic_id === state.topicId));
+    }
+    function examList() {
+      return state.exam.ids.map(id => questionById(id)).filter(Boolean);
+    }
+    function currentList() { return state.exam.active ? examList() : filteredQuestions(); }
+    function currentQuestion() { return currentList()[state.idx] || null; }
+    function clampIdx() {
+      const n = currentList().length;
+      if (state.idx >= n) state.idx = Math.max(0, n - 1);
+      if (state.idx < 0) state.idx = 0;
     }
 
-    function shuffleSession() {
-      rebuildOrder(true);
-      state.activeQuestionIndex = 0;
-      notify('🔀 Savollar va variantlar aralashtirildi.', 'info');
-      renderApp();
-    }
-
-    async function loadCatalogFromCache() {
-      const cached = await idbGet('catalog');
-      if (!cached) return false;
-      state.subjects = cached.subjects || [];
-      state.topics = cached.topics || [];
-      state.questions = cached.questions || [];
-      rebuildOrder(false);
+    async function loadCachedCatalog() {
+      const c = await idbGet('catalog_v4');
+      if (!c) return false;
+      state.subjects = c.subjects || [];
+      state.topics = c.topics || [];
+      state.questions = c.questions || [];
+      rebuildOrder();
       return state.questions.length > 0 || state.subjects.length > 0;
     }
 
-    async function syncCatalogFromSupabase() {
-      if (!await ensureConnected()) { await loadCatalogFromCache(); return false; }
+    async function syncCatalog() {
+      if (!state.sb) {
+        const had = await loadCachedCatalog();
+        state.statusMessage = had ? 'Kesh nusxa ko\'rsatilmoqda. Server bilan aloqa yo\'q.' : 'Ma\'lumot yo\'q. Internetni tekshiring.';
+        state.loading = false;
+        return false;
+      }
       state.loading = true;
       try {
-        const sb = state.supabaseClient;
+        const sb = state.sb;
         const [s, t, q] = await Promise.all([
           sb.from('subjects').select('id,name').order('name'),
           sb.from('topics').select('id,subject_id,name').order('name'),
@@ -569,560 +449,705 @@
         ]);
         const err = s.error || t.error || q.error;
         if (err) throw err;
-
         state.subjects = s.data || [];
         state.topics = t.data || [];
         state.questions = normalizeQuestions(q.data);
-        rebuildOrder(false);
-        await idbSet('catalog', { subjects: state.subjects, topics: state.topics, questions: state.questions });
-
-        if (state.selectedSubjectId && !state.subjects.some(x => x.id === state.selectedSubjectId)) state.selectedSubjectId = '';
-        if (state.selectedTopicId && !state.topics.some(x => x.id === state.selectedTopicId)) state.selectedTopicId = '';
-        clampIndex();
-        state.statusMessage = state.questions.length ? '' : 'Hozircha savollar yo\'q. Admin savollar qo\'shishi kerak.';
+        rebuildOrder();
+        await idbSet('catalog_v4', { subjects: state.subjects, topics: state.topics, questions: state.questions });
+        state.statusMessage = state.questions.length ? '' : 'Hozircha savollar yo\'q. Admin savol qo\'shishi kerak.';
         return true;
       } catch (e) {
-        const had = await loadCatalogFromCache();
-        state.statusMessage = had
-          ? 'Kesh nusxa ko\'rsatilmoqda. (' + errMsg(e) + ')'
-          : errMsg(e);
+        const had = await loadCachedCatalog();
+        state.statusMessage = (had ? 'Kesh nusxa: ' : 'Yuklanmadi: ') + errMsg(e);
         return false;
       } finally {
         state.loading = false;
+        clampIdx();
       }
     }
 
-    function filteredQuestions() {
-      const qMap = new Map(state.questions.map(q => [q.id, q]));
-      const ordered = state.displayOrder.length
-        ? state.displayOrder.map(id => qMap.get(id)).filter(Boolean)
-        : state.questions;
-
-      return ordered.filter(q =>
-        (!state.selectedSubjectId || q.subject_id === state.selectedSubjectId) &&
-        (!state.selectedTopicId || q.topic_id === state.selectedTopicId));
+    /* ---------------- Ulanish va autentifikatsiya ---------------- */
+    async function initClient() {
+      if (state.sb) return true;
+      if (!window.supabase || !window.supabase.createClient) {
+        notify('Kutubxona yuklanmadi. Internetni tekshiring.', 'error');
+        return false;
+      }
+      try {
+        state.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        });
+        const { data } = await state.sb.auth.getSession();
+        await applySession(data && data.session ? data.session : null);
+        state.sb.auth.onAuthStateChange((event, session) => {
+          setTimeout(() => handleAuthEvent(event, session), 0);
+        });
+        return true;
+      } catch (e) {
+        state.sb = null;
+        notify('Ulanishda xatolik: ' + errMsg(e), 'error');
+        return false;
+      }
     }
-    function clampIndex() {
-      const n = filteredQuestions().length;
-      if (state.activeQuestionIndex >= n) state.activeQuestionIndex = Math.max(0, n - 1);
-      if (state.activeQuestionIndex < 0) state.activeQuestionIndex = 0;
-    }
-    function currentQuestion() { return filteredQuestions()[state.activeQuestionIndex] || null; }
+    async function ensureClient() { return state.sb ? true : initClient(); }
 
-    function goToQuestion(i) {
-      const n = filteredQuestions().length;
-      if (!n) return;
-      state.activeQuestionIndex = Math.min(n - 1, Math.max(0, i));
-      renderApp();
+    async function applySession(session) {
+      state.session = session || null;
+      state.userId = session && session.user ? session.user.id : null;
+      state.userEmail = session && session.user ? (session.user.email || '') : '';
+      state.isAdmin = false;
+      if (state.sb && state.session) {
+        try {
+          const { data, error } = await state.sb.rpc('is_admin');
+          state.isAdmin = !error && data === true;
+        } catch (_) { state.isAdmin = false; }
+      }
+      if (!state.isAdmin && state.view === 'admin') state.view = 'quiz';
+    }
+
+    function clearUserState() {
+      state.answers = {};
+      state.picks = {};
+      state.history = null;
+      state.leaderboard = null;
+      state.lastExam = null;
+      stopExam(true);
+    }
+
+    async function handleAuthEvent(event, session) {
+      try {
+        if (event === 'INITIAL_SESSION') return;
+        if (event === 'TOKEN_REFRESHED') { state.session = session; return; }
+        if (event === 'PASSWORD_RECOVERY') {
+          const pw = window.prompt('Yangi parolni kiriting (kamida 6 belgi):');
+          if (pw && pw.length >= 6) {
+            const { error } = await state.sb.auth.updateUser({ password: pw });
+            notify(error ? errMsg(error) : 'Parol yangilandi.', error ? 'error' : 'success');
+          }
+          return;
+        }
+        const before = state.userId;
+        await applySession(session);
+        if (before !== state.userId) clearUserState();
+        await syncCatalog();
+        renderApp();
+      } catch (e) {
+        notify(errMsg(e), 'error');
+      }
+    }
+
+    function openAuth() {
+      const s = $('auth-sheet');
+      s.classList.remove('hidden'); s.classList.add('flex');
+      renderAuthSheet();
+    }
+    function closeAuth() {
+      const s = $('auth-sheet');
+      s.classList.add('hidden'); s.classList.remove('flex');
+    }
+    function renderAuthSheet() {
+      const logged = !!state.session;
+      $('login-form').classList.toggle('hidden', logged);
+      $('logged-box').classList.toggle('hidden', !logged);
+      if (logged) {
+        $('logged-email').textContent = state.userEmail;
+        $('logged-role').textContent = state.isAdmin ? 'Rol: Admin (server tasdiqlagan)' : 'Rol: Foydalanuvchi';
+      }
+    }
+
+    async function doLogin(form) {
+      if (!await ensureClient()) return;
+      const email = form.elements.email.value.trim();
+      const password = form.elements.password.value;
+      setAuthHint('Tekshirilmoqda...', false);
+      $('login-btn').disabled = true;
+      try {
+        const { error } = await state.sb.auth.signInWithPassword({ email, password });
+        if (error) { setAuthHint(errMsg(error), true); return; }
+        form.reset();
+        setAuthHint('', false);
+        closeAuth();
+        notify('Muvaffaqiyatli kirdingiz.', 'success');
+      } finally {
+        $('login-btn').disabled = false;
+      }
+    }
+
+    async function doSignup() {
+      if (!await ensureClient()) return;
+      const email = $('login-email').value.trim();
+      const password = $('login-password').value;
+      if (!email || !email.includes('@')) return setAuthHint('To\'g\'ri email kiriting.', true);
+      if (password.length < 6) return setAuthHint('Parol kamida 6 belgi bo\'lishi kerak.', true);
+      $('signup-btn').disabled = true;
+      try {
+        const { data, error } = await state.sb.auth.signUp({
+          email, password,
+          options: { emailRedirectTo: location.origin + location.pathname }
+        });
+        if (error) return setAuthHint(errMsg(error), true);
+        if (data && data.session) {
+          $('login-form').reset(); setAuthHint('', false); closeAuth();
+          notify('Akkaunt yaratildi va tizimga kirdingiz.', 'success');
+        } else {
+          setAuthHint('Tasdiqlash xati emailingizga yuborildi. Havolani bosib, so\'ng kiring.', false);
+        }
+      } finally {
+        $('signup-btn').disabled = false;
+      }
+    }
+
+    async function doReset() {
+      if (!await ensureClient()) return;
+      const email = $('login-email').value.trim();
+      if (!email || !email.includes('@')) return setAuthHint('Avval emailingizni kiriting.', true);
+      const { error } = await state.sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+      if (error) return setAuthHint(errMsg(error), true);
+      setAuthHint('Parolni tiklash havolasi emailingizga yuborildi.', false);
+    }
+
+    async function doLogout() {
+      if (!state.sb) return;
+      const { error } = await state.sb.auth.signOut();
+      if (error) return notify(errMsg(error), 'error');
+      closeAuth();
+      notify('Tizimdan chiqdingiz.', 'info');
+    }
+
+    /* ---------------- Mashq ---------------- */
+    function practiceStats() {
+      const list = filteredQuestions();
+      let correct = 0, wrong = 0;
+      list.forEach(q => { const a = state.answers[q.id]; if (a) a.correct ? correct++ : wrong++; });
+      return { total: list.length, correct, wrong, left: list.length - correct - wrong };
     }
 
     function pickAnswer(id) {
       const q = currentQuestion();
-      if (!q || state.verifyingAnswer) return;
-      const done = state.answers[q.id];
-      if (done && done.correct) return;
-      state.draftSelections[q.id] = id;
+      if (!q || state.verifying) return;
+      if (state.exam.active) {
+        state.exam.picks[q.id] = id;
+      } else {
+        const done = state.answers[q.id];
+        if (done && done.correct) return;
+        state.picks[q.id] = id;
+      }
       renderApp();
     }
 
     async function verifyCurrent() {
       const q = currentQuestion();
-      if (!q || state.verifyingAnswer) return;
-      const chosenId = state.draftSelections[q.id];
-      if (!chosenId) return;
-      if (!await ensureConnected()) { notify('Baza bilan aloqa yo\'q.', 'warn'); return; }
-      if (!navigator.onLine) { notify('Javobni tekshirish uchun internet kerak.', 'warn'); return; }
-
-      state.verifyingAnswer = true;
-      renderApp();
+      if (!q || state.verifying || state.exam.active) return;
+      const chosen = state.picks[q.id];
+      if (!chosen) return;
+      if (!await ensureClient()) return notify('Baza bilan aloqa yo\'q.', 'warn');
+      if (!navigator.onLine) return notify('Javobni tekshirish uchun internet kerak.', 'warn');
+      state.verifying = true; renderApp();
       try {
-        const { data, error } = await state.supabaseClient.rpc('verify_answer', {
-          p_question_id: q.id,
-          p_answer_id: chosenId
-        });
+        const { data, error } = await state.sb.rpc('verify_answer', { p_question_id: q.id, p_answer_id: chosen });
         if (error) throw error;
-
-        const ok = typeof data === 'boolean' ? data : Boolean(data && data.correct);
-        const explanation = (data && typeof data === 'object') ? data.explanation : null;
+        const ok = !!(data && data.correct === true);
         const prev = state.answers[q.id];
-
         state.answers[q.id] = {
-          answerId: chosenId,
           correct: ok,
-          explanation: explanation,
-          attemptsCount: (prev ? prev.attemptsCount : 0) + 1
+          picked: chosen,
+          explanation: (data && data.explanation) || '',
+          attempts: (prev ? prev.attempts : 0) + 1
         };
         state.history = null;
         notify(ok ? '✅ To\'g\'ri javob!' : '❌ Noto\'g\'ri javob.', ok ? 'success' : 'error');
       } catch (e) {
         notify('Tekshirishda xatolik: ' + errMsg(e), 'error');
       } finally {
-        state.verifyingAnswer = false;
+        state.verifying = false;
         renderApp();
       }
     }
 
-    function sessionStats() {
-      const list = filteredQuestions();
-      const total = list.length;
-      let correct = 0, wrong = 0;
-      list.forEach(q => {
-        const a = state.answers[q.id];
-        if (a) a.correct ? correct++ : wrong++;
-      });
-      return { total, correct, wrong, left: total - correct - wrong };
+    function goTo(i) {
+      const n = currentList().length;
+      if (!n) return;
+      state.idx = Math.min(n - 1, Math.max(0, i));
+      renderApp();
     }
 
-    async function loadHistory() {
-      if (!state.supabaseClient || !state.session) { state.history = []; return; }
+    /* ---------------- Imtihon ---------------- */
+    function startExam() {
+      if (!state.session) {
+        notify('Imtihon topshirish uchun tizimga kiring.', 'warn');
+        return openAuth();
+      }
+      const list = filteredQuestions();
+      if (!list.length) return notify('Bu tanlovda savollar yo\'q.', 'warn');
+      stopExam(true);
+      state.exam = {
+        active: true,
+        ids: list.map(q => q.id),
+        left: list.length * EXAM_SECONDS_PER_QUESTION,
+        timer: setInterval(tickExam, 1000),
+        startedAt: Date.now(),
+        submitting: false,
+        picks: {}
+      };
+      state.idx = 0;
+      state.view = 'quiz';
+      notify('⏱️ Imtihon boshlandi. Vaqt: ' + Math.round(state.exam.left / 60) + ' daqiqa.', 'info');
+      renderApp();
+    }
+
+    function stopExam(silent) {
+      if (state.exam.timer) clearInterval(state.exam.timer);
+      state.exam.timer = null;
+      state.exam.active = false;
+      if (!silent) renderApp();
+      else updateExamPill();
+    }
+
+    function tickExam() {
+      if (!state.exam.active) return stopExam(true);
+      state.exam.left--;
+      updateExamPill();
+      if (state.exam.left <= 0) {
+        notify('⏰ Vaqt tugadi. Javoblar yuborilmoqda.', 'warn');
+        finishExam(true);
+      }
+    }
+
+    function updateExamPill() {
+      const pill = $('exam-pill');
+      const t = fmtClock(state.exam.left);
+      pill.classList.toggle('hidden', !state.exam.active);
+      pill.textContent = '⏱️ ' + t;
+      pill.classList.toggle('text-rose-200', state.exam.left <= 60 && state.exam.active);
+      document.querySelectorAll('[data-clock]').forEach(el => { el.textContent = t; });
+    }
+
+    async function finishExam(auto) {
+      const ex = state.exam;
+      if (!ex.active || ex.submitting) return;
+      const unanswered = ex.ids.filter(id => !ex.picks[id]).length;
+      if (!auto && unanswered > 0) {
+        const ok = await askConfirm('Javob berilmagan savollar: ' + unanswered + ' ta. Baribir yakunlaysizmi?', 'Imtihonni yakunlash');
+        if (!ok) return;
+      }
+      if (!await ensureClient()) return notify('Baza bilan aloqa yo\'q. Qayta urinib ko\'ring.', 'error');
+      ex.submitting = true;
+      renderApp();
       try {
-        const { data, error } = await state.supabaseClient
-          .from('attempts').select('question_id,is_correct,created_at')
+        const answered = ex.ids.filter(id => ex.picks[id]);
+        const checks = await Promise.all(answered.map(async id => {
+          const { data, error } = await state.sb.rpc('verify_answer', { p_question_id: id, p_answer_id: ex.picks[id] });
+          if (error) throw error;
+          return { id, picked: ex.picks[id], ok: !!(data && data.correct === true), explanation: (data && data.explanation) || '' };
+        }));
+        const byId = new Map(checks.map(c => [c.id, c]));
+        const correct = checks.filter(c => c.ok).length;
+        const total = ex.ids.length;
+        state.lastExam = {
+          total, correct,
+          percent: Math.round(correct * 100 / total),
+          seconds: Math.round((Date.now() - ex.startedAt) / 1000),
+          details: ex.ids.map(id => ({ id, answered: byId.has(id), ok: !!(byId.get(id) && byId.get(id).ok), explanation: byId.get(id) ? byId.get(id).explanation : '' })),
+          at: new Date().toISOString()
+        };
+        stopExam(true);
+        state.history = null;
+        state.view = 'results';
+        const p = state.lastExam.percent;
+        notify('Imtihon yakunlandi: ' + correct + '/' + total + ' (' + p + '%)', p >= PASS_PERCENT ? 'success' : 'warn');
+      } catch (e) {
+        ex.submitting = false;
+        if (auto) { if (ex.timer) clearInterval(ex.timer); ex.timer = null; }
+        notify('Yuborishda xatolik: ' + errMsg(e) + '. Qayta urinib ko\'ring.', 'error');
+        renderApp();
+        return;
+      }
+      renderApp();
+    }
+
+    /* ---------------- Serverdagi tarix ---------------- */
+    async function loadHistory() {
+      if (!state.sb || !state.session) { state.history = []; return; }
+      try {
+        const { data, error } = await state.sb.from('attempts')
+          .select('question_id,is_correct,created_at')
           .order('created_at', { ascending: false }).limit(500);
         if (error) throw error;
         state.history = data || [];
       } catch (e) {
         state.history = [];
-        notify('Tarixni yuklab bo\'lmadi: ' + errMsg(e), 'warn');
+        notify('Tarix yuklanmadi: ' + errMsg(e), 'warn');
       }
+      if (state.view === 'results') renderApp();
+    }
+
+    async function loadLeaderboard() {
+      // Reyting uchun sxemada 'exams' jadvali yo'q; bu bo'lim keyinroq qo'shiladi.
+      state.leaderboard = [];
       renderApp();
     }
 
-    function tabsDef() {
-      const t = [{ id: 'quiz', label: '📝 Test' }, { id: 'results', label: '📊 Natijalar' }];
-      if (state.isServerAdmin) t.push({ id: 'admin', label: '🛠️ Admin' });
+    /* ---------------- Navigatsiya ---------------- */
+    function navigate(view) {
+      if (state.exam.active && view !== 'quiz') {
+        return notify('Imtihon davom etmoqda. Avval uni yakunlang.', 'warn');
+      }
+      state.view = view;
+      if (view === 'results' && state.history === null && state.session) loadHistory();
+      if (view === 'leaderboard' && state.leaderboard === null) loadLeaderboard();
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function tabs() {
+      const t = [
+        { id: 'quiz', label: '📝 Test' },
+        { id: 'results', label: '📊 Natija' }
+      ];
+      if (state.isAdmin) t.push({ id: 'admin', label: '🛠️ Admin' });
       return t;
     }
 
+    /* ---------------- Render: umumiy ---------------- */
     function renderNav() {
-      const nav = $('prod-nav-tabs');
-      if (!nav) return;
-      nav.innerHTML = tabsDef().map(t => {
-        const active = state.view === t.id;
+      $('top-nav').innerHTML = tabs().map(t => {
+        const on = state.view === t.id;
         return '<button type="button" data-act="nav" data-view="' + t.id + '" class="tactile-btn shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-black border ' +
-          (active ? 'lemon-btn' : 'bg-slate-950/80 text-slate-200 border-slate-600/60 hover:bg-slate-900') + '"' +
-          (active ? ' aria-current="page"' : '') + '>' + t.label + '</button>';
+          (on ? 'lemon-btn' : 'bg-slate-950/80 text-slate-200 border-slate-600/60 hover:bg-slate-900') + '"' + (on ? ' aria-current="page"' : '') + '>' + t.label + '</button>';
       }).join('');
     }
 
     function renderDock() {
-      const dock = $('prod-mobile-dock');
-      if (!dock) return;
       const items = [
-        { act: 'nav', view: 'quiz', icon: '📝', label: 'Test', on: state.view === 'quiz' },
-        { act: 'nav', view: 'results', icon: '📊', label: 'Natija', on: state.view === 'results' },
-        state.isServerAdmin
-          ? { act: 'nav', view: 'admin', icon: '🛠️', label: 'Admin', on: state.view === 'admin' }
-          : { act: 'auth', icon: '🔐', label: state.session ? 'Akkaunt' : 'Kirish', on: false },
-        { act: 'theme', icon: '🌓', label: 'Rejim', on: false }
+        { view: 'quiz', icon: '📝', label: 'Test' },
+        { view: 'results', icon: '📊', label: 'Natija' },
+        state.isAdmin
+          ? { view: 'admin', icon: '🛠️', label: 'Admin' }
+          : { act: 'auth', icon: '🔐', label: state.session ? 'Akkaunt' : 'Kirish' },
+        { act: 'theme', icon: '🌓', label: 'Rejim' }
       ];
-      dock.innerHTML = items.map(i =>
-        '<button type="button" data-act="' + i.act + '"' + (i.view ? ' data-view="' + i.view + '"' : '') +
-        ' class="tactile-btn flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[10px] font-black ' +
-        (i.on ? 'bg-lime-300/20 text-lime-200' : 'text-slate-300 hover:bg-slate-900') + '"><span class="text-lg leading-none">' + i.icon + '</span>' + i.label + '</button>'
-      ).join('');
+      $('dock').innerHTML = items.map(i => {
+        const on = i.view && state.view === i.view;
+        return '<button type="button" data-act="' + (i.view ? 'nav' : i.act) + '"' + (i.view ? ' data-view="' + i.view + '"' : '') +
+          ' class="tactile-btn flex flex-col items-center gap-0.5 py-1.5 rounded-xl text-[10px] font-black ' +
+          (on ? 'bg-lime-300/20 text-lime-200' : 'text-slate-300 hover:bg-slate-900') + '"><span class="text-lg leading-none" aria-hidden="true">' + i.icon + '</span>' + i.label + '</button>';
+      }).join('');
     }
 
-    function selectOptions(list, selected, placeholder) {
-      return (placeholder != null ? '<option value="">' + esc(placeholder) + '</option>' : '') +
-        list.map(x => '<option value="' + esc(x.id) + '"' + (x.id === selected ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('');
+    function renderHeader() {
+      $('session-banner').textContent = state.session
+        ? state.userEmail + ' • ' + (state.isAdmin ? 'Admin' : 'Foydalanuvchi')
+        : 'Mehmon rejimi • natijalar saqlanmaydi';
+      $('auth-btn').textContent = state.session ? '👤 ' + state.userEmail.split('@')[0] : '🔐 Kirish';
+      const pill = $('network-pill');
+      const base = 'px-2.5 py-1.5 rounded-xl border text-[11px] font-extrabold ';
+      if (!navigator.onLine) { pill.textContent = '📴 Offline'; pill.className = base + 'bg-amber-950/90 text-amber-200 border-amber-400/40'; }
+      else if (state.sb) { pill.textContent = '☁️ Ulangan'; pill.className = base + 'bg-emerald-950/90 text-lime-200 border-lime-300/40'; }
+      else { pill.textContent = '🔌 Ulanmagan'; pill.className = base + 'bg-slate-950/85 text-sky-200 border-sky-300/30'; }
+      updateExamPill();
     }
 
-    function renderQuizView() {
-      const subjects = state.subjects;
-      const topics = state.topics.filter(t => !state.selectedSubjectId || t.subject_id === state.selectedSubjectId);
-      const list = filteredQuestions();
+    function renderMain(animate) {
+      const main = $('view');
+      let html;
+      if (state.view === 'admin') html = viewAdmin();
+      else if (state.view === 'results') html = viewResults();
+      else if (state.view === 'leaderboard') html = viewLeaderboard();
+      else html = viewQuiz();
+      main.innerHTML = html;
+      if (animate && window.gsap && main.children.length) {
+        gsap.fromTo(main.children, { y: 6, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, stagger: 0.03, clearProps: 'all' });
+      }
+    }
+
+    function renderApp(animate) {
+      clampIdx();
+      renderNav();
+      renderMain(animate === true);
+      renderDock();
+      renderHeader();
+      if (state.editor) renderEditor();
+      if (state.view === 'admin' && !state.isAdmin) state.view = 'quiz';
+    }
+
+    const tile = (v, label, cls) =>
+      '<div class="rounded-2xl bg-slate-950/70 border border-slate-800 p-3 text-center"><div class="text-2xl font-black tabular-nums ' + (cls || 'text-lime-300') + '">' + esc(v) + '</div><div class="text-[11px] text-slate-400 font-bold">' + esc(label) + '</div></div>';
+    const emptyCard = (icon, text, extra) =>
+      '<section class="app-card p-8 text-center space-y-3"><div class="text-4xl" aria-hidden="true">' + icon + '</div><p class="text-sm font-bold text-slate-200">' + esc(text) + '</p>' + (extra || '') + '</section>';
+    const selectOpts = (list, selected, placeholder) =>
+      (placeholder != null ? '<option value="">' + esc(placeholder) + '</option>' : '') +
+      list.map(x => '<option value="' + esc(x.id) + '"' + (x.id === selected ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('');
+
+    /* ---------------- Render: Test (mashq + imtihon) ---------------- */
+    function viewQuiz() {
+      const ex = state.exam.active;
+      const list = currentList();
       const q = currentQuestion();
-      const st = sessionStats();
-      const pct = st.total ? Math.round(((st.correct + st.wrong) / st.total) * 100) : 0;
+      const topics = state.topics.filter(t => !state.subjectId || t.subject_id === state.subjectId);
+      const st = practiceStats();
 
-      let html = '<section class="app-card rounded-3xl p-4 sm:p-5 space-y-3">' +
-        '<div class="flex flex-wrap items-center justify-between gap-2">' +
-        '<div class="flex items-center gap-2"><h1 class="text-lg font-black lemon-title">📝 Test ishlash</h1>' +
-        '<button type="button" data-act="shuffle" class="tactile-btn px-2.5 py-1 rounded-xl bg-slate-900 text-sky-200 border border-slate-700 text-[11px] font-black">🔀 Aralashtirish</button>' +
-        (!state.examMode
-          ? '<button type="button" data-act="start-exam" class="tactile-btn px-2.5 py-1 rounded-xl bg-amber-950/80 text-amber-200 border border-amber-400/40 text-[11px] font-black">⏱️ Imtihon</button>'
-          : '<button type="button" data-act="stop-exam" class="tactile-btn px-2.5 py-1 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-400/40 text-[11px] font-black">⏹️ Yakunlash</button>') +
-        '</div>' +
-        '<div class="flex gap-1.5 text-[11px] font-black">' +
-        '<span class="lemon-pill px-2.5 py-1 rounded-full">✅ ' + st.correct + '</span>' +
-        '<span class="px-2.5 py-1 rounded-full bg-rose-950/70 text-rose-200 border border-rose-400/35">❌ ' + st.wrong + '</span>' +
-        '<span class="px-2.5 py-1 rounded-full bg-slate-900 text-slate-300 border border-slate-700">⏳ ' + st.left + '</span></div></div>' +
-        '<div class="grid sm:grid-cols-2 gap-2.5">' +
-        '<select data-change="subject" aria-label="Fan" class="field">' + selectOptions(subjects, state.selectedSubjectId, 'Barcha fanlar (' + state.questions.length + ' savol)') + '</select>' +
-        '<select data-change="topic" aria-label="Mavzu" class="field">' + selectOptions(topics, state.selectedTopicId, 'Barcha mavzular') + '</select></div>' +
-        '<div class="h-2 rounded-full bg-slate-900 overflow-hidden border border-slate-800"><div class="h-full lemon-btn transition-all duration-300" style="width:' + pct + '%"></div></div>' +
-        '</section>';
-
-      if (!q) {
-        html += '<section class="app-card rounded-3xl p-8 text-center space-y-3">' +
-          '<div class="text-4xl">' + (state.loading ? '⏳' : '📭') + '</div>' +
-          '<p class="text-sm font-bold text-slate-200">' + esc(state.loading ? 'Yuklanmoqda...' : (state.statusMessage || 'Bu filtr bo\'yicha savol topilmadi.')) + '</p>' +
+      let top;
+      if (ex) {
+        const answered = state.exam.ids.filter(id => state.exam.picks[id]).length;
+        const pct = Math.round(answered * 100 / state.exam.ids.length);
+        top = '<section class="app-card p-4 sm:p-5 space-y-3">' +
+          '<div class="flex flex-wrap items-center justify-between gap-2">' +
+          '<h1 class="text-lg font-black lemon-title">⏱️ Imtihon rejimi</h1>' +
+          '<div class="flex items-center gap-2"><span class="text-xl font-black text-amber-200 tabular-nums" data-clock>' + fmtClock(state.exam.left) + '</span>' +
+          '<button type="button" data-act="exam-finish" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black"' + (state.exam.submitting ? ' disabled' : '') + '>' +
+          (state.exam.submitting ? '<span class="spinner"></span> Yuborilmoqda...' : '🏁 Yakunlash') + '</button></div></div>' +
+          '<div class="text-[11px] font-bold text-slate-300">Javob berildi: ' + answered + ' / ' + state.exam.ids.length + '</div>' +
+          '<div class="h-2 rounded-full bg-slate-900 overflow-hidden border border-slate-800"><div class="h-full lemon-btn" style="width:' + pct + '%"></div></div>' +
+          '<p class="text-[11px] text-slate-400">Imtihon davomida javoblar darhol tekshirilmaydi. Natija "Yakunlash" dan keyin ko\'rsatiladi.</p>' +
           '</section>';
-        return html;
+      } else {
+        top = '<section class="app-card p-4 sm:p-5 space-y-3">' +
+          '<div class="flex flex-wrap items-center justify-between gap-2">' +
+          '<div class="flex flex-wrap items-center gap-2"><h1 class="text-lg font-black lemon-title">📝 Test ishlash</h1>' +
+          '<button type="button" data-act="shuffle" class="tactile-btn px-2.5 py-1 rounded-xl bg-slate-900 text-sky-200 border border-slate-700 text-[11px] font-black">🔀 ' + (state.shuffle ? 'Tartibga qaytarish' : 'Aralashtirish') + '</button>' +
+          '<button type="button" data-act="exam-start" class="tactile-btn px-2.5 py-1 rounded-xl bg-amber-950/80 text-amber-200 border border-amber-400/40 text-[11px] font-black">⏱️ Imtihon</button></div>' +
+          '<div class="flex gap-1.5 text-[11px] font-black">' +
+          '<span class="lemon-pill px-2.5 py-1 rounded-full">✅ ' + st.correct + '</span>' +
+          '<span class="px-2.5 py-1 rounded-full bg-rose-950/70 text-rose-200 border border-rose-400/35">❌ ' + st.wrong + '</span>' +
+          '<span class="px-2.5 py-1 rounded-full bg-slate-900 text-slate-300 border border-slate-700">⏳ ' + st.left + '</span></div></div>' +
+          '<div class="grid sm:grid-cols-2 gap-2.5">' +
+          '<select data-change="subject" aria-label="Fan" class="field">' + selectOpts(state.subjects, state.subjectId, 'Barcha fanlar') + '</select>' +
+          '<select data-change="topic" aria-label="Mavzu" class="field">' + selectOpts(topics, state.topicId, 'Barcha mavzular') + '</select></div>' +
+          '<div class="h-2 rounded-full bg-slate-900 overflow-hidden border border-slate-800"><div class="h-full lemon-btn transition-all duration-300" style="width:' + (st.total ? Math.round((st.correct + st.wrong) * 100 / st.total) : 0) + '%"></div></div>' +
+          (!state.session ? '<p class="text-[11px] text-amber-300 font-bold">Mehmon rejimi: natijalar saqlanmaydi. <button type="button" data-act="auth" class="underline">Kirish</button></p>' : '') +
+          '</section>';
       }
 
-      const done = state.answers[q.id];
-      const draftId = state.draftSelections[q.id];
-      const opts = state.shuffledOptionsMap[q.id] || q.options;
-      const img = safeUrl(q.image_url);
-      const subjObj = state.subjects.find(x => x.id === q.subject_id);
+      if (state.loading && !state.questions.length) return top + emptyCard('⏳', 'Savollar yuklanmoqda...');
+      if (!q) return top + emptyCard('📭', state.statusMessage || 'Bu filtr bo\'yicha savol topilmadi.');
 
-      html += '<section class="app-card rounded-3xl p-4 sm:p-6 space-y-4">' +
+      const done = ex ? null : state.answers[q.id];
+      const pick = ex ? state.exam.picks[q.id] : state.picks[q.id];
+      const opts = optionsFor(q);
+      const img = safeUrl(q.image_url);
+      const subj = subjectName(q.subject_id);
+      const tp = topicName(q.topic_id);
+
+      let html = top + '<section class="app-card p-4 sm:p-6 space-y-4">' +
         '<div class="flex flex-wrap items-center justify-between gap-2 text-[11px] font-black text-slate-400">' +
-        '<span>Savol ' + (state.activeQuestionIndex + 1) + ' / ' + list.length + (subjObj ? ' • <span class="text-sky-300">' + esc(subjObj.name) + '</span>' : '') + '</span>' +
-        (done ? '<span class="' + (done.correct ? 'text-lime-300' : 'text-rose-300') + '">' + (done.correct ? '✅ Tasdiqlangan' : '❌ Urinishlar: ' + done.attemptsCount) + '</span>' : '') + '</div>' +
-        '<h2 class="text-base sm:text-lg font-extrabold leading-relaxed" style="color:var(--text-primary)">' + esc(q.prompt) + '</h2>' +
-        (img ? '<img src="' + esc(img) + '" alt="Savol rasmi" loading="lazy" referrerpolicy="no-referrer" class="max-h-64 rounded-2xl border border-slate-700 object-contain" onerror="this.style.display=\'none\'" />' : '') +
+        '<span>Savol ' + (state.idx + 1) + ' / ' + list.length + ' • <span class="text-sky-300">' + esc(subj) + '</span>' + (tp ? ' · ' + esc(tp) : '') + '</span>' +
+        (done ? '<span class="' + (done.correct ? 'text-lime-300' : 'text-rose-300') + '">' + (done.correct ? '✅ To\'g\'ri' : '❌ Noto\'g\'ri • urinish: ' + done.attempts) + '</span>' : '') +
+        '</div>' +
+        '<h2 class="text-base sm:text-lg font-extrabold leading-relaxed break-words">' + esc(q.prompt) + '</h2>' +
+        (img ? '<img src="' + esc(img) + '" alt="Savol rasmi" loading="lazy" referrerpolicy="no-referrer" class="max-h-64 max-w-full rounded-2xl border border-slate-700 object-contain" onerror="this.style.display=\'none\'" />' : '') +
         '<div class="grid gap-2.5" role="radiogroup">' +
         opts.map((o, i) => {
-          const isDraft = draftId === o.id;
-          const isChecked = done && done.answerId === o.id;
           let cls = 'bg-slate-950/70 border-slate-700 text-slate-100';
           let mark = String.fromCharCode(65 + i);
-
-          if (isChecked && (!isDraft || isDraft === o.id)) {
+          if (done && done.picked === o.id) {
             cls = done.correct ? 'bg-emerald-950/80 border-lime-300/80 text-lime-100' : 'bg-rose-950/80 border-rose-400/70 text-rose-100';
             mark = done.correct ? '✓' : '✕';
-          } else if (isDraft) {
+          } else if (pick === o.id) {
             cls = 'bg-lime-300/15 border-lime-300/70 text-lime-100';
           }
-
-          return '<button type="button" role="radio" aria-checked="' + (isDraft ? 'true' : 'false') + '" data-act="pick" data-id="' + esc(o.id) + '"' +
+          return '<button type="button" role="radio" aria-checked="' + (pick === o.id ? 'true' : 'false') + '" data-act="pick" data-id="' + esc(o.id) + '"' +
             (done && done.correct ? ' disabled' : '') +
             ' class="opt-btn flex items-center gap-3 text-left px-4 py-3 rounded-2xl border text-sm font-semibold ' + cls + '">' +
             '<span class="w-7 h-7 shrink-0 rounded-lg bg-slate-900 border border-slate-600 flex items-center justify-center text-xs font-black">' + mark + '</span>' +
-            '<span class="flex-1">' + esc(o.label) + '</span></button>';
+            '<span class="flex-1 min-w-0 break-words">' + esc(o.label) + '</span></button>';
         }).join('') + '</div>' +
         (done && done.correct && done.explanation
           ? '<div class="p-3.5 rounded-2xl bg-emerald-950/50 border border-lime-300/30 text-xs text-lime-100 leading-relaxed"><strong class="text-lime-300">💡 Izoh:</strong> ' + esc(done.explanation) + '</div>'
           : '') +
         '<div class="flex flex-wrap items-center gap-2 pt-1">' +
-        '<button type="button" data-act="prev" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-xs font-black"' + (state.activeQuestionIndex === 0 ? ' disabled' : '') + '>← Oldingi</button>' +
-        '<button type="button" data-act="verify" class="lemon-btn flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-black"' +
-        ((!draftId || state.verifyingAnswer || (done && done.correct)) ? ' disabled' : '') + '>' +
-        (state.verifyingAnswer ? '<span class="spinner"></span> Tekshirilmoqda...' : '🔎 Javobni tekshirish') + '</button>' +
-        '<button type="button" data-act="next" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-xs font-black"' + (state.activeQuestionIndex >= list.length - 1 ? ' disabled' : '') + '>Keyingi →</button></div>' +
+        '<button type="button" data-act="prev" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-xs font-black"' + (state.idx === 0 ? ' disabled' : '') + '>← Oldingi</button>' +
+        (ex ? '' :
+          '<button type="button" data-act="verify" class="lemon-btn flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-black"' +
+          ((!pick || state.verifying || (done && done.correct)) ? ' disabled' : '') + '>' +
+          (state.verifying ? '<span class="spinner"></span> Tekshirilmoqda...' : '🔎 Javobni tekshirish') + '</button>') +
+        '<button type="button" data-act="next" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-xs font-black"' + (state.idx >= list.length - 1 ? ' disabled' : '') + '>Keyingi →</button></div>' +
+        '<p class="text-[11px] text-slate-500">Klaviatura: 1–6 variant, Enter tekshirish, ← → savollar.</p>' +
         '</section>';
 
-      html += '<section class="app-card rounded-3xl p-4"><div class="flex flex-wrap gap-1.5">' +
+      html += '<section class="app-card p-4"><div class="flex flex-wrap gap-1.5">' +
         list.map((x, i) => {
-          const a = state.answers[x.id];
-          const c = i === state.activeQuestionIndex ? 'lemon-btn' :
-            a ? (a.correct ? 'bg-emerald-950/80 text-lime-200 border-lime-300/50' : 'bg-rose-950/80 text-rose-200 border-rose-400/50') :
-            'bg-slate-950/80 text-slate-300 border-slate-700';
-          return '<button type="button" data-act="goto" data-i="' + i + '" class="tactile-btn w-9 h-9 rounded-xl border text-xs font-black ' + c + '">' + (i + 1) + '</button>';
+          let c;
+          if (i === state.idx) c = 'lemon-btn';
+          else if (ex) c = state.exam.picks[x.id] ? 'bg-sky-950/80 text-sky-200 border-sky-400/50' : 'bg-slate-950/80 text-slate-300 border-slate-700';
+          else {
+            const a = state.answers[x.id];
+            c = a ? (a.correct ? 'bg-emerald-950/80 text-lime-200 border-lime-300/50' : 'bg-rose-950/80 text-rose-200 border-rose-400/50') : 'bg-slate-950/80 text-slate-300 border-slate-700';
+          }
+          return '<button type="button" data-act="goto" data-i="' + i + '" class="tactile-btn w-9 h-9 rounded-xl border text-xs font-black ' + c + '" aria-label="Savol ' + (i + 1) + '">' + (i + 1) + '</button>';
         }).join('') + '</div></section>';
 
       return html;
     }
 
-    function renderResultsView() {
-      const st = sessionStats();
-      const scorePct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+    /* ---------------- Render: Natija ---------------- */
+    function viewResults() {
+      let html = '';
+      const le = state.lastExam;
+      if (le) {
+        const pass = le.percent >= PASS_PERCENT;
+        const map = new Map(state.questions.map(q => [q.id, q]));
+        html += '<section class="app-card p-6 text-center space-y-4">' +
+          '<h1 class="text-lg font-black lemon-title">🎯 So\'nggi imtihon natijasi</h1>' +
+          '<div class="flex justify-center"><div class="ring" style="background:conic-gradient(' + (pass ? '#a3e635' : '#fb7185') + ' ' + le.percent + '%, #1e293b 0)"><div class="ring-inner"><div class="text-3xl font-black tabular-nums ' + (pass ? 'text-lime-300' : 'text-rose-300') + '">' + le.percent + '%</div></div></div></div>' +
+          '<div class="text-sm font-black ' + (pass ? 'text-lime-300' : 'text-rose-300') + '">' + (pass ? '🎉 Muvaffaqiyatli topshirdingiz!' : '💪 Yana urinib ko\'ring') + ' (o\'tish: ' + PASS_PERCENT + '%)</div>' +
+          '<div class="grid grid-cols-3 gap-2.5">' + tile(le.correct, 'To\'g\'ri') + tile(le.total - le.correct, 'Xato', 'text-rose-300') + tile(fmtClock(le.seconds), 'Sarflangan vaqt', 'text-sky-300') + '</div>' +
+          '<button type="button" data-act="exam-start" class="lemon-btn px-5 py-2.5 rounded-xl text-xs font-black">🔄 Yangi imtihon</button></section>';
+        html += '<section class="app-card p-4 sm:p-5 space-y-3"><h2 class="text-base font-black lemon-title">Imtihon savollari</h2><ul class="space-y-2">' +
+          le.details.map((d, i) => {
+            const q = map.get(d.id);
+            if (!q) return '';
+            const status = !d.answered ? '<span class="text-amber-300 font-black">Javob berilmagan</span>'
+              : d.ok ? '<span class="text-lime-300 font-black">✅ To\'g\'ri</span>' : '<span class="text-rose-300 font-black">❌ Noto\'g\'ri</span>';
+            return '<li class="rounded-2xl bg-slate-950/60 border border-slate-800 p-3.5 space-y-1.5"><div class="text-sm font-extrabold break-words">' + (i + 1) + '. ' + esc(q.prompt) + '</div>' +
+              '<div class="text-[11px]">' + status + '</div>' +
+              (d.ok && d.explanation ? '<div class="text-xs text-slate-300"><span class="font-black text-lime-300">💡 Izoh:</span> ' + esc(d.explanation) + '</div>' : '') + '</li>';
+          }).join('') + '</ul></section>';
+      }
 
-      const subjectBreakdown = state.subjects.map(s => {
-        const qs = state.questions.filter(q => q.subject_id === s.id);
-        const ok = qs.filter(q => state.answers[q.id] && state.answers[q.id].correct).length;
-        return { name: s.name, total: qs.length, ok, pct: qs.length ? Math.round((ok / qs.length) * 100) : 0 };
-      }).filter(x => x.total > 0);
+      const st = practiceStats();
+      html += '<section class="app-card p-5 space-y-4"><div class="flex items-center justify-between"><h1 class="text-lg font-black lemon-title">📊 Joriy mashq</h1>' +
+        '<span class="lemon-pill px-3 py-1 rounded-full text-xs font-black">' + (st.total ? Math.round(st.correct * 100 / st.total) : 0) + '%</span></div>' +
+        '<div class="grid grid-cols-3 gap-2.5">' + tile(st.correct, 'To\'g\'ri') + tile(st.wrong, 'Xato', 'text-rose-300') + tile(st.left, 'Qolgan', 'text-sky-300') + '</div>' +
+        '<button type="button" data-act="reset-practice" class="tactile-btn px-4 py-2 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">🔄 Mashqni nollash</button></section>';
 
-      let html = '<section class="app-card rounded-3xl p-5 space-y-4">' +
-        '<div class="flex items-center justify-between"><h1 class="text-lg font-black lemon-title">📊 Joriy sessiya natijalari</h1>' +
-        '<span class="lemon-pill px-3 py-1 rounded-full text-xs font-black">Natija: ' + scorePct + '%</span></div>' +
-        '<div class="grid grid-cols-3 gap-2.5 text-center">' +
-        '<div class="rounded-2xl bg-slate-950/70 border border-slate-800 p-3"><div class="text-2xl font-black text-lime-300">' + st.correct + '</div><div class="text-[11px] text-slate-400 font-bold">To\'g\'ri</div></div>' +
-        '<div class="rounded-2xl bg-slate-950/70 border border-slate-800 p-3"><div class="text-2xl font-black text-rose-300">' + st.wrong + '</div><div class="text-[11px] text-slate-400 font-bold">Xato</div></div>' +
-        '<div class="rounded-2xl bg-slate-950/70 border border-slate-800 p-3"><div class="text-2xl font-black text-sky-300">' + st.left + '</div><div class="text-[11px] text-slate-400 font-bold">Qolgan</div></div></div>' +
-        (subjectBreakdown.length ? '<div class="space-y-2.5 pt-2 border-t border-slate-800"><div class="text-xs font-black text-slate-300">Fanlar bo\'yicha ko\'rsatkich:</div>' +
-          subjectBreakdown.map(sb => '<div><div class="flex justify-between text-[11px] font-bold mb-1"><span>' + esc(sb.name) + '</span><span class="text-lime-300">' + sb.ok + '/' + sb.total + ' (' + sb.pct + '%)</span></div>' +
-          '<div class="h-1.5 rounded-full bg-slate-900 overflow-hidden"><div class="h-full lemon-btn" style="width:' + sb.pct + '%"></div></div></div>').join('') + '</div>' : '') +
-        '<div class="flex gap-2"><button type="button" data-act="reset-session" class="tactile-btn px-4 py-2 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black">🔄 Sessiyani nollash</button></div></section>';
-
-      html += '<section class="app-card rounded-3xl p-5 space-y-3"><h2 class="text-base font-black lemon-title">🗂️ Serverdagi umumiy tarix</h2>';
+      html += '<section class="app-card p-5 space-y-3"><h2 class="text-base font-black lemon-title">🗂️ Serverdagi tarix</h2>';
       if (!state.session) {
-        html += '<p class="text-xs text-slate-300">Natijalaringizni saqlash va ko\'rish uchun tizimga kiring.</p><button type="button" data-act="auth" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black">🔐 Kirish / Ro\'yxat</button>';
+        html += '<p class="text-xs text-slate-300">Tarixni ko\'rish uchun tizimga kiring.</p><button type="button" data-act="auth" class="lemon-btn px-4 py-2 rounded-xl text-xs font-black">🔐 Kirish</button>';
       } else if (state.history === null) {
-        html += '<p class="text-xs text-slate-300"><span class="spinner" style="border-color:rgba(190,242,100,.3);border-top-color:#bef264"></span> Yuklanmoqda...</p>';
+        html += '<p class="text-xs text-slate-300"><span class="spinner spinner-lime"></span> Yuklanmoqda...</p>';
       } else if (!state.history.length) {
-        html += '<p class="text-xs text-slate-300">Hozircha bazada urinishlar yo\'q.</p>';
+        html += '<p class="text-xs text-slate-300">Hozircha urinishlar yo\'q.</p>';
       } else {
         const total = state.history.length;
         const ok = state.history.filter(h => h.is_correct).length;
         const uniq = new Set(state.history.map(h => h.question_id)).size;
-        html += '<div class="grid grid-cols-3 gap-2.5 text-center">' +
-          '<div class="rounded-2xl bg-slate-950/70 border border-slate-800 p-3"><div class="text-xl font-black text-sky-300">' + total + '</div><div class="text-[11px] text-slate-400 font-bold">Jami urinish</div></div>' +
-          '<div class="rounded-2xl bg-slate-950/70 border border-slate-800 p-3"><div class="text-xl font-black text-lime-300">' + Math.round(ok / total * 100) + '%</div><div class="text-[11px] text-slate-400 font-bold">Aniqlik</div></div>' +
-          '<div class="rounded-2xl bg-slate-950/70 border border-slate-800 p-3"><div class="text-xl font-black text-amber-300">' + uniq + '</div><div class="text-[11px] text-slate-400 font-bold">Ishlangan savol</div></div></div>';
+        html += '<div class="grid grid-cols-3 gap-2.5">' + tile(total, 'Jami urinish', 'text-sky-300') + tile(Math.round(ok * 100 / total) + '%', 'Aniqlik') + tile(uniq, 'Ishlangan savol', 'text-amber-300') + '</div>';
       }
       return html + '</section>';
     }
 
-    function render403() {
-      return '<section class="app-card rounded-3xl p-10 text-center space-y-3 max-w-xl mx-auto">' +
-        '<div class="text-6xl font-black text-rose-300">403</div>' +
-        '<h1 class="text-xl font-black lemon-title">Ruxsat yo\'q</h1>' +
-        '<p class="text-sm text-slate-300">Bu bo\'lim faqat adminlar uchun.</p>' +
-        '<button type="button" data-act="nav" data-view="quiz" class="lemon-btn px-5 py-2.5 rounded-xl text-xs font-black">← Testga qaytish</button></section>';
+    /* ---------------- Render: Reyting (joriy holatda placeholder) ---------------- */
+    function viewLeaderboard() {
+      return emptyCard('🏆', 'Reyting bo\'limi keyingi yangilanishda qo\'shiladi.', '');
     }
 
-    function renderAdminView() {
-      if (!state.isServerAdmin) return render403();
-      const tabs = [['subjects', '📚 Fanlar'], ['topics', '🧩 Mavzular'], ['questions', '❓ Savollar']];
-      let html = '<section class="app-card rounded-3xl p-4 flex flex-wrap items-center justify-between gap-2">' +
-        '<div class="flex flex-wrap items-center gap-2"><h1 class="text-lg font-black lemon-title mr-2">🛠️ Admin Boshqaruv</h1>' +
-        tabs.map(t => '<button type="button" data-act="admin-tab" data-tab="' + t[0] + '" class="tactile-btn px-3.5 py-1.5 rounded-xl text-xs font-black border ' +
-          (state.adminTab === t[0] ? 'lemon-btn' : 'bg-slate-950/80 text-slate-200 border-slate-600/60') + '">' + t[1] + '</button>').join('') + '</div>' +
-        '<button type="button" data-act="export-json" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-sky-200 border border-slate-700 text-xs font-black">📥 JSON Zaxira</button></section>';
+    /* ---------------- Render: Admin ---------------- */
+    function viewAdmin() {
+      if (!state.isAdmin) {
+        return '<section class="app-card p-10 text-center space-y-3 max-w-xl mx-auto"><div class="text-6xl font-black text-rose-300">403</div><h1 class="text-xl font-black lemon-title">Ruxsat yo\'q</h1><p class="text-sm text-slate-300">Bu bo\'lim faqat adminlar uchun.</p><button type="button" data-act="nav" data-view="quiz" class="lemon-btn px-5 py-2.5 rounded-xl text-xs font-black">← Testga qaytish</button></section>';
+      }
+      const tabsDef = [['subjects', '📚 Fanlar'], ['topics', '🧩 Mavzular'], ['questions', '❓ Savollar']];
+      let html = '<section class="app-card p-4 flex flex-wrap items-center gap-2"><h1 class="text-lg font-black lemon-title mr-2">🛠️ Admin</h1>' +
+        tabsDef.map(t => '<button type="button" data-act="admin-tab" data-tab="' + t[0] + '" class="tactile-btn px-3.5 py-1.5 rounded-xl text-xs font-black border ' +
+          (state.adminTab === t[0] ? 'lemon-btn' : 'bg-slate-950/80 text-slate-200 border-slate-600/60') + '">' + t[1] + '</button>').join('') + '</section>';
 
       if (state.adminTab === 'subjects') {
-        html += '<section class="app-card rounded-3xl p-5 space-y-4">' +
-          '<form data-form="subject" class="flex gap-2"><input name="name" required maxlength="120" placeholder="Yangi fan nomi (masalan: Matematika)" class="field" />' +
+        html += '<section class="app-card p-5 space-y-4"><form data-form="subject-add" class="flex gap-2"><input name="name" required maxlength="120" placeholder="Yangi fan nomi" class="field" />' +
           '<button class="lemon-btn px-4 rounded-xl text-xs font-black shrink-0">➕ Qo\'shish</button></form>' +
           '<ul class="divide-y divide-slate-800">' +
-          (state.subjects.map(s => '<li class="flex items-center justify-between py-2.5 text-sm"><span class="font-bold">' + esc(s.name) + '</span>' +
-            '<button type="button" data-act="del-subject" data-id="' + esc(s.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-[11px] font-black">🗑️ O\'chirish</button></li>').join('') ||
+          (state.subjects.map(s => '<li class="flex items-center justify-between gap-2 py-2.5 text-sm"><span class="font-bold break-words min-w-0">' + esc(s.name) + ' <span class="text-[11px] text-slate-400 font-normal">· ' + state.questions.filter(q => q.subject_id === s.id).length + ' savol</span></span>' +
+            '<button type="button" data-act="subject-del" data-id="' + esc(s.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-[11px] font-black shrink-0">🗑️</button></li>').join('') ||
             '<li class="py-3 text-xs text-slate-400">Fanlar yo\'q.</li>') + '</ul></section>';
       }
-
       if (state.adminTab === 'topics') {
-        html += '<section class="app-card rounded-3xl p-5 space-y-4">' +
-          '<form data-form="topic" class="grid sm:grid-cols-[1fr_1fr_auto] gap-2">' +
-          '<select name="subject_id" required class="field">' + selectOptions(state.subjects, '', 'Fanni tanlang') + '</select>' +
+        html += '<section class="app-card p-5 space-y-4"><form data-form="topic-add" class="grid sm:grid-cols-[1fr_1fr_auto] gap-2">' +
+          '<select name="subject_id" required class="field">' + selectOpts(state.subjects, '', 'Fanni tanlang') + '</select>' +
           '<input name="name" required maxlength="120" placeholder="Yangi mavzu nomi" class="field" />' +
           '<button class="lemon-btn px-4 py-2.5 rounded-xl text-xs font-black">➕ Qo\'shish</button></form>' +
           '<ul class="divide-y divide-slate-800">' +
-          (state.topics.map(t => {
-            const s = state.subjects.find(x => x.id === t.subject_id);
-            return '<li class="flex items-center justify-between py-2.5 text-sm"><span><span class="font-bold">' + esc(t.name) + '</span> <span class="text-slate-400 text-xs">· ' + esc(s ? s.name : '—') + '</span></span>' +
-              '<button type="button" data-act="del-topic" data-id="' + esc(t.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-[11px] font-black">🗑️ O\'chirish</button></li>';
-          }).join('') || '<li class="py-3 text-xs text-slate-400">Mavzular yo\'q.</li>') + '</ul></section>';
+          (state.topics.map(t => '<li class="flex items-center justify-between gap-2 py-2.5 text-sm"><span class="min-w-0 break-words"><span class="font-bold">' + esc(t.name) + '</span> <span class="text-[11px] text-slate-400">· ' + esc(subjectName(t.subject_id)) + '</span></span>' +
+            '<button type="button" data-act="topic-del" data-id="' + esc(t.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-[11px] font-black shrink-0">🗑️</button></li>').join('') ||
+            '<li class="py-3 text-xs text-slate-400">Mavzular yo\'q.</li>') + '</ul></section>';
       }
-
       if (state.adminTab === 'questions') {
-        const d = state.editingDraft;
-        const dTopics = state.topics.filter(t => t.subject_id === d.subject_id);
-        const qList = state.questions.filter(q => !state.adminSearch || q.prompt.toLowerCase().includes(state.adminSearch.toLowerCase()));
-
-        html += '<section class="app-card rounded-3xl p-5 space-y-3">' +
-          '<div class="flex items-center justify-between"><h2 class="text-base font-black lemon-title">' + (state.editingQuestionId ? '✏️ Savolni tahrirlash' : '➕ Yangi savol qo\'shish') + '</h2>' +
-          (state.editingQuestionId ? '<button type="button" data-act="cancel-edit" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-[11px] font-black">Bekor qilish</button>' : '') + '</div>' +
-          '<form data-form="question" class="space-y-3">' +
-          '<div class="grid sm:grid-cols-2 gap-2.5">' +
-          '<select data-input="subject_id" required class="field">' + selectOptions(state.subjects, d.subject_id, 'Fanni tanlang') + '</select>' +
-          '<select data-input="topic_id" class="field">' + selectOptions(dTopics, d.topic_id, 'Mavzusiz') + '</select></div>' +
-          '<textarea data-input="prompt" required maxlength="2000" rows="3" placeholder="Savol matni" class="field">' + esc(d.prompt) + '</textarea>' +
-          '<div class="grid sm:grid-cols-2 gap-2.5">' +
-          '<input data-input="image_url" type="url" placeholder="Rasm URL (ixtiyoriy, https://...)" value="' + esc(d.image_url) + '" class="field" />' +
-          '<input data-input="explanation" maxlength="1000" placeholder="Izoh / Yechim (to\'g\'ri topganda ko\'rinadi)" value="' + esc(d.explanation) + '" class="field" /></div>' +
-          '<div class="text-[11px] font-black text-lime-300">Variantlar (to\'g\'ri javobni radio tugma bilan belgilang):</div>' +
-          d.options.map((o, i) => '<div class="flex items-center gap-2">' +
-            '<input type="radio" name="correct" data-correct="' + esc(o.id) + '"' + (d.correct_answer_id === o.id ? ' checked' : '') + ' class="accent-lime-400 w-4 h-4" />' +
-            '<input data-opt="' + i + '" required maxlength="500" value="' + esc(o.label) + '" placeholder="Variant ' + String.fromCharCode(65 + i) + '" class="field" />' +
-            '<button type="button" data-act="rm-opt" data-i="' + i + '" class="tactile-btn px-2.5 py-2 rounded-xl bg-slate-900 text-rose-300 border border-slate-700 text-xs font-black"' + (d.options.length <= MIN_OPTIONS ? ' disabled' : '') + '>✕</button></div>').join('') +
-          '<div class="flex flex-wrap gap-2 pt-1">' +
-          '<button type="button" data-act="add-opt" class="tactile-btn px-3.5 py-2 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black"' + (d.options.length >= MAX_OPTIONS ? ' disabled' : '') + '>➕ Variant</button>' +
-          '<button class="lemon-btn flex-1 min-w-[140px] py-2.5 rounded-xl text-xs font-black">💾 Serverga Saqlash</button></div></form></section>';
-
-        html += '<section class="app-card rounded-3xl p-5 space-y-3">' +
-          '<div class="flex flex-wrap items-center justify-between gap-2"><h2 class="text-base font-black lemon-title">Barcha savollar (' + qList.length + ')</h2>' +
-          '<input data-search="admin-q" value="' + esc(state.adminSearch) + '" placeholder="🔍 Savol bo\'yicha qidirish..." class="field sm:max-w-xs" /></div>' +
-          '<ul class="divide-y divide-slate-800">' +
-          (qList.map(q => {
-            const s = state.subjects.find(x => x.id === q.subject_id);
-            return '<li class="py-3 flex items-start justify-between gap-3"><div class="min-w-0"><div class="text-sm font-bold break-words">' + esc(q.prompt.length > 130 ? q.prompt.slice(0, 130) + '…' : q.prompt) + '</div>' +
-              '<div class="text-[11px] text-slate-400">' + esc(s ? s.name : '—') + ' · ' + q.options.length + ' variant</div></div>' +
-              '<div class="flex gap-1.5 shrink-0"><button type="button" data-act="edit-q" data-id="' + esc(q.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-[11px] font-black">✏️</button>' +
-              '<button type="button" data-act="del-q" data-id="' + esc(q.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-[11px] font-black">🗑️</button></div></li>';
-          }).join('') || '<li class="py-3 text-xs text-slate-400">Savollar topilmadi.</li>') + '</ul></section>';
+        html += '<section class="app-card p-5 flex flex-wrap items-center justify-between gap-3">' +
+          '<div><h2 class="text-base font-black lemon-title">Savollar (' + state.questions.length + ')</h2><p class="text-[11px] text-slate-400">Yangi savol yoki tahrirlash uchun tugmani bosing.</p></div>' +
+          '<button type="button" data-act="q-new" class="lemon-btn px-4 py-2.5 rounded-xl text-xs font-black">➕ Yangi savol</button></section>' +
+          '<section class="app-card p-5 space-y-3">' +
+          '<input data-search="admin-q" type="search" value="' + esc(state.adminSearch) + '" placeholder="🔍 Savol bo\'yicha qidirish..." class="field" />' +
+          '<div id="admin-q-list">' + adminQuestionListHtml() + '</div></section>';
       }
       return html;
     }
 
-    function renderMain() {
-      const main = $('prod-main-view');
-      if (!main) return;
-      let html;
-      if (state.view === 'admin') html = renderAdminView();
-      else if (state.view === 'results') html = renderResultsView();
-      else html = renderQuizView();
-      main.innerHTML = html;
-      if (window.gsap) gsap.fromTo(main.children, { y: 6, opacity: 0 }, { y: 0, opacity: 1, duration: 0.2, stagger: 0.03, clearProps: 'all' });
+    function adminQuestionListHtml() {
+      const s = state.adminSearch.trim().toLowerCase();
+      const all = state.questions.filter(q => !s || q.prompt.toLowerCase().indexOf(s) !== -1);
+      const shown = all.slice(0, ADMIN_LIST_LIMIT);
+      if (!shown.length) return '<p class="py-6 text-center text-xs text-slate-400">Savollar topilmadi.</p>';
+      return '<ul class="divide-y divide-slate-800">' + shown.map(q =>
+        '<li class="py-3 flex items-start justify-between gap-3"><div class="min-w-0"><div class="text-sm font-bold break-words">' + esc(q.prompt.length > 140 ? q.prompt.slice(0, 140) + '…' : q.prompt) + '</div>' +
+        '<div class="text-[11px] text-slate-400">' + esc(subjectName(q.subject_id)) + (q.topic_id ? ' · ' + esc(topicName(q.topic_id)) : '') + ' · ' + q.options.length + ' variant</div></div>' +
+        '<div class="flex gap-1.5 shrink-0"><button type="button" data-act="q-edit" data-id="' + esc(q.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-[11px] font-black">✏️</button>' +
+        '<button type="button" data-act="q-del" data-id="' + esc(q.id) + '" class="tactile-btn px-3 py-1.5 rounded-xl bg-rose-950/80 text-rose-200 border border-rose-500/35 text-[11px] font-black">🗑️</button></div></li>').join('') +
+        '</ul>' + (all.length > shown.length ? '<p class="text-[11px] text-slate-400 pt-2">Ko\'rsatilmoqda: ' + shown.length + ' / ' + all.length + '. Qidiruvdan foydalaning.</p>' : '');
     }
 
-    function renderApp() {
-      renderNav();
-      renderMain();
-      renderDock();
-      updateNetworkBadge();
-      updateJwtBanner();
+    /* ---------------- Savol muharriri (modal) ---------------- */
+    function renderEditor() {
+      const sheet = $('editor-sheet');
+      const ed = state.editor;
+      if (!ed) { sheet.classList.add('hidden'); sheet.classList.remove('flex'); sheet.innerHTML = ''; return; }
+      const d = ed.draft;
+      const topics = state.topics.filter(t => t.subject_id === d.subject_id);
+      const img = safeUrl(d.image_url);
+      sheet.innerHTML = '<div class="bottom-sheet-panel w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 max-h-[92vh] overflow-y-auto space-y-4">' +
+        '<div class="flex items-center justify-between border-b border-slate-800 pb-3"><h2 class="text-lg font-black lemon-title">' + (d.id ? '✏️ Savolni tahrirlash' : '➕ Yangi savol') + '</h2>' +
+        '<button type="button" data-act="ed-close" class="tactile-btn px-3 py-1.5 rounded-xl bg-slate-900 text-lime-300 border border-slate-700 text-xs font-black" aria-label="Yopish">✕</button></div>' +
+        '<div class="grid sm:grid-cols-2 gap-2.5">' +
+        '<select data-ed="subject_id" aria-label="Fan" class="field">' + selectOpts(state.subjects, d.subject_id, 'Fanni tanlang') + '</select>' +
+        '<select data-ed="topic_id" aria-label="Mavzu" class="field">' + selectOpts(topics, d.topic_id, 'Mavzusiz') + '</select></div>' +
+        '<textarea data-ed="prompt" rows="3" maxlength="2000" placeholder="Savol matni" class="field">' + esc(d.prompt) + '</textarea>' +
+        '<input data-ed="image_url" type="url" value="' + esc(d.image_url) + '" placeholder="Rasm URL (ixtiyoriy, https://...)" class="field" />' +
+        (img ? '<img src="' + esc(img) + '" alt="Oldindan ko\'rish" referrerpolicy="no-referrer" class="max-h-32 max-w-full rounded-xl border border-slate-700" onerror="this.style.display=\'none\'" />' : '') +
+        '<div class="text-[11px] font-black text-lime-300">Variantlar (to\'g\'ri javobni radio tugma bilan belgilang):</div>' +
+        d.options.map((o, i) => '<div class="flex items-center gap-2"><input type="radio" name="ed-correct" data-ed-correct="' + esc(o.id) + '"' + (d.correct_answer_id === o.id ? ' checked' : '') + ' class="w-4 h-4 shrink-0" aria-label="To\'g\'ri javob ' + (i + 1) + '" />' +
+          '<input data-ed-opt="' + i + '" maxlength="500" value="' + esc(o.label) + '" placeholder="Variant ' + String.fromCharCode(65 + i) + '" class="field" />' +
+          '<button type="button" data-act="ed-rm-opt" data-i="' + i + '" class="tactile-btn px-2.5 py-2 rounded-xl bg-slate-900 text-rose-300 border border-slate-700 text-xs font-black shrink-0"' + (d.options.length <= MIN_OPTIONS ? ' disabled' : '') + ' aria-label="Variantni o\'chirish">✕</button></div>').join('') +
+        '<button type="button" data-act="ed-add-opt" class="tactile-btn px-3.5 py-2 rounded-xl bg-slate-900 text-lime-300 border border-lime-300/35 text-xs font-black"' + (d.options.length >= MAX_OPTIONS ? ' disabled' : '') + '>➕ Variant qo\'shish</button>' +
+        '<textarea data-ed="explanation" rows="2" maxlength="3000" placeholder="Izoh (to\'g\'ri javobdan keyin ko\'rinadi, ixtiyoriy)" class="field">' + esc(d.explanation) + '</textarea>' +
+        '<div class="flex gap-2 pt-1"><button type="button" data-act="ed-save" class="lemon-btn flex-1 py-2.5 rounded-xl text-xs font-black"' + (ed.saving ? ' disabled' : '') + '>' +
+        (ed.saving ? '<span class="spinner"></span> Saqlanmoqda...' : '💾 Serverga saqlash') + '</button>' +
+        '<button type="button" data-act="ed-close" class="tactile-btn px-4 py-2.5 rounded-xl bg-slate-900 text-slate-200 border border-slate-700 text-xs font-black">Bekor qilish</button></div></div>';
+      sheet.classList.remove('hidden'); sheet.classList.add('flex');
     }
 
-    function navigate(view) {
-      state.view = view;
-      if (view === 'results' && state.history === null && state.session) loadHistory();
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function openAuthSheet() {
-      const s = $('jwt-auth-sheet');
-      s.classList.remove('hidden'); s.classList.add('flex');
-      setAuthHint('', false);
-    }
-    function closeAuthSheet() {
-      const s = $('jwt-auth-sheet');
-      s.classList.add('hidden'); s.classList.remove('flex');
-    }
-    async function toggleSoftDayMode() {
-      state.softDayMode = !state.softDayMode;
-      document.body.classList.toggle('soft-day-mode', state.softDayMode);
-      await idbSet('ui_soft_day', state.softDayMode);
-    }
+    function closeEditor() { state.editor = null; renderEditor(); }
 
-    async function submitJwtLogin(e) {
-      e.preventDefault();
-      if (state.authBusy) return;
-      if (!await ensureConnected()) {
-        setAuthHint('Baza bilan aloqa o\'rnatilmadi. Internetni tekshiring.', true);
-        return;
-      }
-      const email = $('jwt-login-email').value.trim();
-      const password = $('jwt-login-password').value;
-      setAuthBusy(true);
-      setAuthHint('Kirish tekshirilmoqda...', false);
-      try {
-        const { error } = await state.supabaseClient.auth.signInWithPassword({ email, password });
-        if (error) {
-          const msg = errMsg(error);
-          setAuthHint(msg, true);
-          notify('Kirish xatosi: ' + msg, 'error');
-          return;
-        }
-        $('jwt-login-password').value = '';
-        setAuthHint('', false);
-        closeAuthSheet();
-        notify('Muvaffaqiyatli kirdingiz!', 'success');
-      } finally {
-        setAuthBusy(false);
-      }
-    }
-
-    async function signUpJwt() {
-      if (state.authBusy) return;
-      if (!await ensureConnected()) {
-        setAuthHint('Baza bilan aloqa o\'rnatilmadi. Internetni tekshiring.', true);
-        return;
-      }
-      const email = $('jwt-login-email').value.trim();
-      const password = $('jwt-login-password').value;
-      if (!email || !email.includes('@')) {
-        setAuthHint('To\'g\'ri email kiriting (masalan: ism@gmail.com).', true);
-        return;
-      }
-      if (password.length < 6) {
-        setAuthHint('Parol kamida 6 ta belgidan iborat bo\'lishi kerak.', true);
-        return;
-      }
-
-      setAuthBusy(true);
-      setAuthHint('Ro\'yxatdan o\'tkazilmoqda...', false);
-      try {
-        const { data, error } = await state.supabaseClient.auth.signUp({ email, password });
-        if (error) {
-          const msg = errMsg(error);
-          setAuthHint(msg, true);
-          notify('Ro\'yxatdan o\'tish xatosi: ' + msg, 'error');
-          return;
-        }
-        $('jwt-login-password').value = '';
-        if (data && data.session) {
-          setAuthHint('', false);
-          closeAuthSheet();
-          notify('Ro\'yxatdan o\'tdingiz va tizimga kirdingiz!', 'success');
-        } else {
-          setAuthHint('Akkaunt yaratildi! Endi "Kirish" tugmasini bosing (agar email tasdiqlash yoqilgan bo\'lsa, emailingizni tekshiring).', false);
-          notify('Ro\'yxatdan o\'tish yakunlandi.', 'success');
-        }
-      } finally {
-        setAuthBusy(false);
-      }
-    }
-
-    async function logoutJwt() {
-      if (!state.supabaseClient) return;
-      const { error } = await state.supabaseClient.auth.signOut();
-      if (error) return notify('Chiqishda xatolik: ' + errMsg(error), 'error');
-      state.answers = {};
-      state.draftSelections = {};
-      if (state.view === 'admin') state.view = 'quiz';
-      setAuthHint('', false);
-      notify('Tizimdan chiqdingiz.', 'info');
-    }
-
-    function requireAdmin() {
-      if (!state.isServerAdmin) { notify('403: admin huquqi yo\'q.', 'error'); state.view = 'admin'; renderApp(); return false; }
-      return true;
-    }
-    async function afterMutation(msg) {
-      await syncCatalogFromSupabase();
-      notify(msg, 'success');
-      renderApp();
-    }
-
-    async function adminAddSubject(form) {
+    async function openEditor(id) {
       if (!requireAdmin()) return;
-      const name = form.elements.name.value.trim();
-      if (!name) return;
-      const { error } = await state.supabaseClient.from('subjects').insert({ name });
-      if (error) return notify(errMsg(error), 'error');
-      form.reset();
-      afterMutation('Fan qo\'shildi.');
-    }
-    async function adminAddTopic(form) {
-      if (!requireAdmin()) return;
-      const name = form.elements.name.value.trim();
-      const subject_id = form.elements.subject_id.value;
-      if (!name || !subject_id) return;
-      const { error } = await state.supabaseClient.from('topics').insert({ name, subject_id });
-      if (error) return notify(errMsg(error), 'error');
-      afterMutation('Mavzu qo\'shildi.');
-    }
-    async function adminDelete(table, id, label) {
-      if (!requireAdmin()) return;
-      const ok = await askConfirm(label + ' o\'chirilsinmi? Bu amalni qaytarib bo\'lmaydi.', 'O\'chirishni tasdiqlang');
-      if (!ok) return;
-      const { error } = await state.supabaseClient.from(table).delete().eq('id', id);
-      if (error) return notify(errMsg(error), 'error');
-      afterMutation('O\'chirildi.');
-    }
-
-    async function adminEditQuestion(id) {
-      if (!requireAdmin()) return;
-      const q = state.questions.find(x => x.id === id);
+      if (!id) {
+        const sid = state.subjects[0] ? state.subjects[0].id : '';
+        state.editor = { saving: false, draft: blankDraft(sid, '') };
+        return renderEditor();
+      }
+      const q = questionById(id);
       if (!q) return;
-      const { data, error } = await state.supabaseClient.rpc('admin_get_correct_answer', { p_question_id: id });
-      if (error) return notify(errMsg(error), 'error');
-
-      const correctId = (data && typeof data === 'object') ? data.correct_answer_id : data;
-      const explanation = (data && typeof data === 'object') ? (data.explanation || '') : '';
-
-      state.editingQuestionId = id;
-      state.editingDraft = {
-        subject_id: q.subject_id,
-        topic_id: q.topic_id || '',
-        prompt: q.prompt,
-        image_url: q.image_url || '',
-        explanation: explanation,
-        options: q.options.map(o => ({ id: o.id, label: o.label })),
-        correct_answer_id: correctId || (q.options[0] && q.options[0].id) || ''
-      };
-      renderApp();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      try {
+        const { data, error } = await state.sb.rpc('admin_get_correct_answer', { p_question_id: id });
+        if (error) throw error;
+        const correct = (data && data.correct_answer_id) || (q.options[0] && q.options[0].id) || '';
+        state.editor = {
+          saving: false,
+          draft: {
+            id: q.id, subject_id: q.subject_id, topic_id: q.topic_id || '',
+            prompt: q.prompt, image_url: q.image_url || '',
+            explanation: (data && data.explanation) || '',
+            options: q.options.map(o => ({ id: o.id, label: o.label })),
+            correct_answer_id: correct
+          }
+        };
+        renderEditor();
+      } catch (e) {
+        notify(errMsg(e), 'error');
+      }
     }
 
-    async function adminSaveQuestion() {
+    async function saveEditor() {
       if (!requireAdmin()) return;
-      const d = state.editingDraft;
+      const ed = state.editor;
+      if (!ed || ed.saving) return;
+      const d = ed.draft;
       const labels = d.options.map(o => o.label.trim());
       if (!d.subject_id) return notify('Fanni tanlang.', 'warn');
       if (!d.prompt.trim()) return notify('Savol matnini kiriting.', 'warn');
@@ -1130,76 +1155,100 @@
       if (new Set(labels.map(l => l.toLowerCase())).size !== labels.length) return notify('Variantlar takrorlanmasligi kerak.', 'warn');
       if (!d.options.some(o => o.id === d.correct_answer_id)) return notify('To\'g\'ri javobni belgilang.', 'warn');
       if (d.image_url.trim() && !safeUrl(d.image_url)) return notify('Rasm URL noto\'g\'ri.', 'warn');
+      ed.saving = true; renderEditor();
+      try {
+        const { error } = await state.sb.rpc('admin_save_question', {
+          p_id: d.id,
+          p_subject_id: d.subject_id,
+          p_topic_id: d.topic_id || null,
+          p_prompt: d.prompt.trim(),
+          p_image_url: safeUrl(d.image_url) || null,
+          p_options: d.options.map((o, i) => ({ id: o.id, label: labels[i] })),
+          p_correct_id: d.correct_answer_id,
+          p_explanation: d.explanation.trim() || null
+        });
+        if (error) throw error;
+        state.editor = null;
+        renderEditor();
+        await afterMutation('Savol saqlandi.');
+      } catch (e) {
+        ed.saving = false; renderEditor();
+        notify(errMsg(e), 'error');
+      }
+    }
 
-      const { error } = await state.supabaseClient.rpc('admin_save_question', {
-        p_id: state.editingQuestionId,
-        p_subject_id: d.subject_id,
-        p_topic_id: d.topic_id || null,
-        p_prompt: d.prompt.trim(),
-        p_image_url: safeUrl(d.image_url) || null,
-        p_options: d.options.map((o, i) => ({ id: o.id, label: labels[i] })),
-        p_correct_id: d.correct_answer_id,
-        p_explanation: d.explanation.trim() || null
-      });
+    /* ---------------- Admin amallari ---------------- */
+    function requireAdmin() {
+      if (!state.sb || !state.isAdmin) { notify('403: admin huquqi yo\'q.', 'error'); return false; }
+      return true;
+    }
+    async function afterMutation(msg) {
+      await syncCatalog();
+      if (msg) notify(msg, 'success');
+      renderApp();
+    }
+    async function adminInsert(table, row, okMsg) {
+      if (!requireAdmin()) return false;
+      const { error } = await state.sb.from(table).insert(row);
+      if (error) { notify(errMsg(error), 'error'); return false; }
+      await afterMutation(okMsg);
+      return true;
+    }
+    async function adminDelete(table, id, text) {
+      if (!requireAdmin()) return;
+      const ok = await askConfirm(text, 'O\'chirishni tasdiqlang');
+      if (!ok) return;
+      const { error } = await state.sb.from(table).delete().eq('id', id);
       if (error) return notify(errMsg(error), 'error');
-      const sid = d.subject_id, tid = d.topic_id;
-      state.editingQuestionId = null;
-      state.editingDraft = blankDraft(sid, tid);
-      afterMutation('Savol bazaga saqlandi.');
+      afterMutation('O\'chirildi.');
     }
 
-    function exportBackupJson() {
-      const payload = {
-        exported_at: new Date().toISOString(),
-        subjects: state.subjects,
-        topics: state.topics,
-        questions: state.questions
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'bilimxona-backup-' + new Date().toISOString().slice(0, 10) + '.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      notify('📥 JSON zaxira fayli yuklab olindi.', 'success');
-    }
-
+    /* ---------------- Hodisalar ---------------- */
     document.addEventListener('click', e => {
       const el = e.target.closest('[data-act]');
       if (!el || el.disabled) return;
       const act = el.dataset.act;
+      const id = el.dataset.id;
       switch (act) {
         case 'nav': navigate(el.dataset.view); break;
-        case 'auth': openAuthSheet(); break;
-        case 'theme': toggleSoftDayMode(); break;
-        case 'shuffle': shuffleSession(); break;
-        case 'start-exam': startExamMode(); break;
-        case 'stop-exam': stopExamMode(false); break;
-        case 'pick': pickAnswer(el.dataset.id); break;
-        case 'verify': verifyCurrent(); break;
-        case 'prev': goToQuestion(state.activeQuestionIndex - 1); break;
-        case 'next': goToQuestion(state.activeQuestionIndex + 1); break;
-        case 'goto': goToQuestion(parseInt(el.dataset.i, 10)); break;
-        case 'reset-session':
-          state.answers = {}; state.draftSelections = {};
-          notify('Sessiya nollandi.', 'info'); renderApp(); break;
-        case 'admin-tab': state.adminTab = el.dataset.tab; renderApp(); break;
-        case 'export-json': exportBackupJson(); break;
-        case 'del-subject': adminDelete('subjects', el.dataset.id, 'Fan va unga tegishli savollar'); break;
-        case 'del-topic': adminDelete('topics', el.dataset.id, 'Mavzu'); break;
-        case 'del-q': adminDelete('questions', el.dataset.id, 'Savol'); break;
-        case 'edit-q': adminEditQuestion(el.dataset.id); break;
-        case 'cancel-edit': state.editingQuestionId = null; state.editingDraft = blankDraft(); renderApp(); break;
-        case 'add-opt':
-          if (state.editingDraft.options.length < MAX_OPTIONS) { state.editingDraft.options.push({ id: uuid(), label: '' }); renderApp(); }
+        case 'auth': openAuth(); break;
+        case 'auth-close': closeAuth(); break;
+        case 'signup': doSignup(); break;
+        case 'reset': doReset(); break;
+        case 'logout': doLogout(); break;
+        case 'theme':
+          state.soft = !state.soft;
+          document.body.classList.toggle('soft-day-mode', state.soft);
+          idbSet('ui_soft_day', state.soft);
           break;
-        case 'rm-opt': {
-          const d = state.editingDraft, i = parseInt(el.dataset.i, 10);
-          if (d.options.length > MIN_OPTIONS) {
-            const [rm] = d.options.splice(i, 1);
+        case 'shuffle': state.shuffle = !state.shuffle; rebuildOrder(); state.idx = 0; renderApp(); break;
+        case 'pick': pickAnswer(id); break;
+        case 'verify': verifyCurrent(); break;
+        case 'prev': goTo(state.idx - 1); break;
+        case 'next': goTo(state.idx + 1); break;
+        case 'goto': goTo(parseInt(el.dataset.i, 10)); break;
+        case 'exam-start': startExam(); break;
+        case 'exam-finish': finishExam(false); break;
+        case 'reset-practice': state.answers = {}; state.picks = {}; renderApp(); break;
+        case 'admin-tab': state.adminTab = el.dataset.tab; renderApp(); break;
+        case 'subject-del': adminDelete('subjects', id, 'Fan va unga tegishli barcha savollar o\'chiriladi. Davom etasizmi?'); break;
+        case 'topic-del': adminDelete('topics', id, 'Mavzu o\'chirilsinmi? Savollar saqlanib qoladi.'); break;
+        case 'q-new': openEditor(null); break;
+        case 'q-edit': openEditor(id); break;
+        case 'q-del': adminDelete('questions', id, 'Savol o\'chirilsinmi? Bu amalni qaytarib bo\'lmaydi.'); break;
+        case 'ed-close': closeEditor(); break;
+        case 'ed-save': saveEditor(); break;
+        case 'ed-add-opt':
+          if (state.editor && state.editor.draft.options.length < MAX_OPTIONS) {
+            state.editor.draft.options.push({ id: uuid(), label: '' }); renderEditor();
+          }
+          break;
+        case 'ed-rm-opt': {
+          const d = state.editor && state.editor.draft;
+          if (d && d.options.length > MIN_OPTIONS) {
+            const rm = d.options.splice(parseInt(el.dataset.i, 10), 1)[0];
             if (rm && rm.id === d.correct_answer_id) d.correct_answer_id = d.options[0].id;
-            renderApp();
+            renderEditor();
           }
           break;
         }
@@ -1208,81 +1257,84 @@
 
     document.addEventListener('change', e => {
       const t = e.target;
-      if (t.dataset.change === 'subject') {
-        state.selectedSubjectId = t.value; state.selectedTopicId = '';
-        state.activeQuestionIndex = 0; renderApp();
-      } else if (t.dataset.change === 'topic') {
-        state.selectedTopicId = t.value; state.activeQuestionIndex = 0; renderApp();
-      } else if (t.dataset.input === 'subject_id') {
-        state.editingDraft.subject_id = t.value; state.editingDraft.topic_id = ''; renderApp();
-      } else if (t.dataset.input === 'topic_id') {
-        state.editingDraft.topic_id = t.value;
-      } else if (t.dataset.correct) {
-        state.editingDraft.correct_answer_id = t.dataset.correct;
+      const d = t.dataset || {};
+      if (d.change === 'subject') { state.subjectId = t.value; state.topicId = ''; state.idx = 0; renderApp(); return; }
+      if (d.change === 'topic') { state.topicId = t.value; state.idx = 0; renderApp(); return; }
+      if (state.editor) {
+        const dr = state.editor.draft;
+        if (d.ed === 'subject_id') { dr.subject_id = t.value; dr.topic_id = ''; renderEditor(); }
+        else if (d.ed === 'topic_id') dr.topic_id = t.value;
+        else if (d.edCorrect !== undefined) dr.correct_answer_id = d.edCorrect;
+        else if (d.ed === undefined && t.dataset.edCorrect) dr.correct_answer_id = t.dataset.edCorrect;
       }
     });
 
     document.addEventListener('input', e => {
-      const t = e.target, d = state.editingDraft;
-      if (t.dataset.input === 'prompt') d.prompt = t.value;
-      else if (t.dataset.input === 'image_url') d.image_url = t.value;
-      else if (t.dataset.input === 'explanation') d.explanation = t.value;
-      else if (t.dataset.opt !== undefined) { const o = d.options[parseInt(t.dataset.opt, 10)]; if (o) o.label = t.value; }
-      else if (t.dataset.search === 'admin-q') {
+      const t = e.target;
+      const d = t.dataset || {};
+      if (d.search === 'admin-q') {
         state.adminSearch = t.value;
-        renderApp();
-        const inp = document.querySelector('[data-search="admin-q"]');
-        if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+        const list = $('admin-q-list');
+        if (list) list.innerHTML = adminQuestionListHtml();
+        return;
+      }
+      if (!state.editor) return;
+      const dr = state.editor.draft;
+      if (d.ed === 'prompt') dr.prompt = t.value;
+      else if (d.ed === 'image_url') dr.image_url = t.value;
+      else if (d.ed === 'explanation') dr.explanation = t.value;
+      else if (d.edOpt !== undefined) { const o = dr.options[parseInt(d.edOpt, 10)]; if (o) o.label = t.value; }
+    });
+
+    document.addEventListener('click', e => {
+      if (e.target.dataset && e.target.dataset.edCorrect !== undefined) {
+        if (state.editor) state.editor.draft.correct_answer_id = e.target.dataset.edCorrect;
       }
     });
 
-    document.addEventListener('submit', e => {
+    document.addEventListener('submit', async e => {
       const f = e.target.closest('[data-form]');
       if (!f) return;
       e.preventDefault();
-      if (f.dataset.form === 'subject') adminAddSubject(f);
-      else if (f.dataset.form === 'topic') adminAddTopic(f);
-      else if (f.dataset.form === 'question') adminSaveQuestion();
+      try {
+        if (f.dataset.form === 'login') await doLogin(f);
+        else if (f.dataset.form === 'subject-add') { if (await adminInsert('subjects', { name: f.elements.name.value.trim() }, 'Fan qo\'shildi.')) f.reset(); }
+        else if (f.dataset.form === 'topic-add') { if (await adminInsert('topics', { subject_id: f.elements.subject_id.value, name: f.elements.name.value.trim() }, 'Mavzu qo\'shildi.')) f.reset(); }
+      } catch (err) {
+        notify(errMsg(err), 'error');
+      }
     });
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') return closeAuthSheet();
+      if (e.key === 'Escape') { if (state.editor) closeEditor(); else closeAuth(); return; }
       const tag = (e.target.tagName || '').toLowerCase();
-      if (['input', 'textarea', 'select'].includes(tag) || e.target.isContentEditable) return;
-      if (state.view !== 'quiz' || !$('jwt-auth-sheet').classList.contains('hidden')) return;
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || e.target.isContentEditable) return;
+      if (state.view !== 'quiz' || !$('auth-sheet').classList.contains('hidden') || state.editor) return;
       const q = currentQuestion();
       if (!q) return;
-      const opts = state.shuffledOptionsMap[q.id] || q.options;
-      if (/^[1-9]$/.test(e.key)) { const o = opts[parseInt(e.key, 10) - 1]; if (o) pickAnswer(o.id); }
-      else if (e.key === 'Enter') verifyCurrent();
-      else if (e.key === 'ArrowRight') goToQuestion(state.activeQuestionIndex + 1);
-      else if (e.key === 'ArrowLeft') goToQuestion(state.activeQuestionIndex - 1);
+      if (/^[1-9]$/.test(e.key)) { const o = optionsFor(q)[parseInt(e.key, 10) - 1]; if (o) pickAnswer(o.id); }
+      else if (e.key === 'Enter' && !state.exam.active) verifyCurrent();
+      else if (e.key === 'ArrowRight') goTo(state.idx + 1);
+      else if (e.key === 'ArrowLeft') goTo(state.idx - 1);
     });
 
-    window.addEventListener('online', async () => {
-      updateNetworkBadge();
-      if (await ensureConnected()) { await syncCatalogFromSupabase(); renderApp(); }
+    window.addEventListener('beforeunload', e => {
+      if (state.exam.active) { e.preventDefault(); e.returnValue = ''; }
     });
-    window.addEventListener('offline', () => { updateNetworkBadge(); notify('Offline rejim: keshlangan savollar ko\'rsatilmoqda.', 'warn'); });
-    $('jwt-auth-sheet').addEventListener('click', e => { if (e.target.id === 'jwt-auth-sheet') closeAuthSheet(); });
+    window.addEventListener('online', async () => { renderHeader(); if (await ensureClient()) { await syncCatalog(); renderApp(); } });
+    window.addEventListener('offline', () => { renderHeader(); notify('Offline: saqlangan savollar ko\'rsatiladi.', 'warn'); });
+    $('auth-sheet').addEventListener('click', e => { if (e.target.id === 'auth-sheet') closeAuth(); });
+    $('editor-sheet').addEventListener('click', e => { if (e.target.id === 'editor-sheet') closeEditor(); });
 
-    window.BilimXonaProd = {
-      navigate, openAuthSheet, closeAuthSheet, toggleSoftDayMode,
-      submitJwtLogin, signUpJwt, logoutJwt
-    };
-
+    /* ---------------- Boshlash ---------------- */
     (async function boot() {
-      renderApp();
-      const soft = await idbGet('ui_soft_day');
-      if (soft) { state.softDayMode = true; document.body.classList.add('soft-day-mode'); }
-
-      const ok = await initSupabaseClient(DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY);
-      if (ok) {
-        await syncCatalogFromSupabase();
-      } else {
-        await loadCatalogFromCache();
-      }
-      renderApp();
+      renderApp(true);
+      if (await idbGet('ui_soft_day')) { state.soft = true; document.body.classList.add('soft-day-mode'); }
+      const ok = await initClient();
+      await syncCatalog();
+      state.loading = false;
+      renderApp(true);
+      if (!ok) notify('Server bilan ulanib bo\'lmadi.', 'warn');
     })();
   })();
   </script>
